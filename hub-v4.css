@@ -228,3 +228,46 @@ dialog{width:min(690px,calc(100vw - 30px));border-radius:20px}
 @media(max-width:900px){.v4-tools>summary span{display:none}.v4-tools>summary{padding:8px 10px}.v4-modal-body{padding:16px}}
 @media(max-width:600px){.v4-tools-panel{right:-55px}.v4-modal-head{padding:14px}.v4-modal-footer{padding:11px 14px}.v4-modal-description{font-size:12px}}
 @media print{.v4-tools{display:none!important}}
+
+/* Hub EMR Touch 4.4 — professional collaborative board surfaces;
+   positions and gesture hit zones remain untouched. */
+.work-header{background:linear-gradient(90deg,#fff 0%,#f6fbfc 100%);border-left-color:#f37021;box-shadow:0 3px 15px #003f4c08}
+.work-context .eyebrow{color:#087e9a;letter-spacing:1.1px}
+.work-header .segmented{background:#eaf2f4;border:1px solid #d7e6eb;padding:4px;border-radius:12px}
+.work-header .segmented button{background:transparent;border-color:transparent;box-shadow:none}
+.work-header .segmented button.chosen{background:#074a5e;color:#fff;box-shadow:0 2px 8px #002b3920}
+.work-content .work-toolbar{background:#fff;box-shadow:0 2px 12px #002d3c08;border-color:#d4e3e8;border-radius:13px}
+.work-content .work-toolbar .segmented{background:#edf4f6;padding:3px;gap:3px}
+.work-content .work-toolbar .segmented button:not(.chosen){background:transparent;border-color:transparent}
+.canvas-shell{box-shadow:0 5px 24px #002e3e0b;border-color:#c9dde3}
+.canvas{background-color:#fbfeff;background-image:radial-gradient(#cbdde3 .95px,transparent .95px);background-size:24px 24px}
+.node .nodebody{box-shadow:0 6px 18px #033c4a15;border-radius:13px}
+.node .nodebody small{color:#2681a0;font-size:11px;font-weight:800;letter-spacing:1px}
+.node .nodebody b{font-size:15px;line-height:1.35;color:#143f4c}
+.node.start .nodebody{background:#e8f6f3;border-color:#24967e}
+.node.decision .nodebody{background:#fff2e5}
+.node.note .nodebody{background:#fff9e5;border-color:#d5a64e}
+.node:focus-visible{outline:3px solid #009bc1;outline-offset:5px;border-radius:16px}
+.canvas-help{background:#f7fbfc;border-top:1px solid #d9e6eb;color:#657c85;padding:10px 14px}
+.kanban-layout{gap:12px}
+.kanban{gap:11px}
+.column{background:#eaf1f4;border-color:#d7e4e9;box-shadow:inset 0 1px 2px #003d4c06;border-radius:14px}
+.column-head{font-size:13px;letter-spacing:-.1px;color:#164557;border-bottom:1px solid #d4e3e8;padding:4px 2px 11px;margin-bottom:10px}
+.column-head .badge{background:#fff;border:1px solid #d7e6eb;border-radius:9px;color:#306476}
+.column[data-column="backlog"]{border-top:4px solid #8b9da7}
+.column[data-column="todo"]{border-top:4px solid #009bc1}
+.column[data-column="doing"]{border-top:4px solid #f37021}
+.column[data-column="validation"]{border-top:4px solid #c19733}
+.column[data-column="done"]{border-top:4px solid #288566}
+.task{border:1px solid #cddfe5;border-top:4px solid #009bc1;border-radius:12px;box-shadow:0 5px 14px #003d4d0b;transition:box-shadow .18s,transform .18s}
+.task:not(.drag-origin):hover{box-shadow:0 7px 20px #003d4d16}
+.task h3{font-weight:750;color:#143e4c}
+.task .assignee-chip{border-radius:9px;background:#f2f8fa;border-color:#c9e2e8;color:#245869}
+.task.blocked{border-color:#c74b5c;border-top-color:#b9394b;background:#fffafa}
+.task.done{border-top-color:#278764}
+.task.cancelled{border-top-color:#8a959c;background:#f5f6f7}
+.people-tray{background:#fff;border:1px solid #d9e6e9;border-radius:14px}
+.people-tray h3{color:#114557}.people-tray .person-drag{border-radius:10px;background:#f5f9fa;min-height:44px}
+.board-hint{font-size:12px;color:#647f8b;line-height:1.4;padding:2px 4px}
+@media(max-width:1250px){.kanban{gap:8px}.column{padding:8px}}
+@media(prefers-reduced-motion:reduce){.task,.node,.work-header{transition:none!important}}
