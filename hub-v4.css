@@ -192,3 +192,39 @@ dialog{border-radius:22px;border:1px solid #d8e6ea;box-shadow:0 20px 90px #00293
  .v4-participant-empty>button{width:100%}
 }
 @media print{.v4-participant-empty{display:none!important}}
+
+/* Hub EMR Touch 4.4 — focused header and refined editing dialogs */
+.v4-tools{position:relative;flex:none;z-index:60}
+.v4-tools>summary{list-style:none;cursor:pointer;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:8px 13px;border:1px solid #dce7ea;border-radius:11px;background:#fff;color:#135066;font-weight:650;font-size:13px;user-select:none}
+.v4-tools>summary::-webkit-details-marker{display:none}
+.v4-tools>summary:hover,.v4-tools[open]>summary{background:#edf7fa;border-color:#a6ced8}
+.v4-tools>summary:focus-visible{outline:3px solid #009bc1;outline-offset:2px}
+.v4-tools-panel{position:absolute;right:0;top:calc(100% + 8px);width:min(310px,calc(100vw - 22px));background:#fff;border:1px solid #d8e6eb;box-shadow:0 18px 48px #00394624;border-radius:15px;padding:10px;display:flex;flex-direction:column;gap:5px}
+.v4-tools-title{font-size:10px;letter-spacing:1.25px;color:#718b94;font-weight:800;padding:8px 10px 5px}
+.top-actions .v4-tools-panel button{display:flex;justify-content:flex-start;align-items:center;text-align:left;width:100%;min-height:46px;padding:10px 12px!important;border:1px solid transparent;border-radius:10px;background:#fff;color:#15485a;font-size:13px;box-shadow:none}
+.top-actions .v4-tools-panel button:hover{background:#eef6f8;border-color:#dce9ed}
+.v4-tools-panel button svg{width:20px;height:20px;flex-shrink:0}
+.v4-tools-panel .optional-label{display:inline!important}
+.v4-tools-panel #densityBtn{gap:8px}
+.v4-tools-panel #densityLabel{margin-left:auto;color:#0f6b82;background:#e7f5f8;border-radius:7px;padding:4px 7px;font-size:11px}
+.v4-tools-item-label{font-size:13px;font-weight:600}
+.v4-tools-panel button#dataBtn{justify-content:flex-start}
+.v4-tools-panel button#dataBtn .v4-tools-item-label{margin-left:3px}
+.v4-tools-panel button#densityBtn .v4-tools-item-label{margin-left:0}
+.v4-tools-panel button:not(#densityBtn) .optional-label{font-size:13px}
+dialog{width:min(690px,calc(100vw - 30px));border-radius:20px}
+.v4-modal-head{padding:17px 21px;background:#fbfefe;align-items:flex-start}
+.v4-modal-titlewrap{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
+.v4-modal-kicker{font-size:10px;letter-spacing:1.3px;font-weight:800;color:#0e88a5}
+.v4-modal-head #modalTitle{font-size:clamp(19px,1.5vw,24px);line-height:1.2;font-weight:750;letter-spacing:-.4px}
+.v4-modal-description{font-size:13px;line-height:1.4;color:#6a818a;max-width:550px}
+.v4-modal-body{gap:15px;padding:21px}
+.v4-modal-body label{font-size:13px;color:#234956;font-weight:700;gap:7px}
+.v4-modal-body input:not([type=checkbox]),.v4-modal-body select,.v4-modal-body textarea{border-radius:10px;min-height:48px;background:#fcfefe;border:1px solid #c4d7dd;font-weight:500;font-size:15px}
+.v4-modal-body input:focus,.v4-modal-body textarea:focus,.v4-modal-body select:focus{outline:2px solid #009bc1;outline-offset:0;border-color:#009bc1}
+.v4-modal-footer{padding:13px 21px;border-top:1px solid #e2ebed;background:#fbfcfd;gap:9px}
+.v4-modal-footer button{min-height:46px}
+@media(max-width:1450px){.top-actions .v4-tools>summary{padding:8px 10px}}
+@media(max-width:900px){.v4-tools>summary span{display:none}.v4-tools>summary{padding:8px 10px}.v4-modal-body{padding:16px}}
+@media(max-width:600px){.v4-tools-panel{right:-55px}.v4-modal-head{padding:14px}.v4-modal-footer{padding:11px 14px}.v4-modal-description{font-size:12px}}
+@media print{.v4-tools{display:none!important}}
