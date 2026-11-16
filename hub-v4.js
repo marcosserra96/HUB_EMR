@@ -26,3 +26,30 @@ Render.ranking=()=>{
 document.addEventListener('input',e=>{if(e.target?.id!=='v4MapSearch')return;const term=e.target.value.trim().toLocaleLowerCase('pt-BR');let found=0;document.querySelectorAll('#v4MapCards .demand').forEach(el=>{const show=el.textContent.toLocaleLowerCase('pt-BR').includes(term);el.hidden=!show;if(show)found++});const el=document.querySelector('#v4MapCount');if(el)el.textContent=found+' resultado'+(found===1?'':'s');});
 if(State.data){Render.page();Render.header();}
 })();
+
+/* Hub EMR Touch 4.3 — compact participant presentation only.
+   Does not modify participants, session data, status, actions or IndexedDB. */
+(()=>{'use strict';
+if(typeof Render==='undefined'||!Render.participants||Render.__hub43)return;
+Render.__hub43=true;
+const original=Render.participants.bind(Render);
+Render.participants=function(){
+ let html=original();
+ html=html.replace('<div class="grid3" style="margin-bottom:24px">','<div class="grid3 v4-participant-stats" style="margin-bottom:12px">');
+ html=html.replace('<div class="row between" style="margin-bottom:16px"><h2>O grupo','<div class="row between v4-participant-listhead" style="margin-bottom:10px"><h2>O grupo');
+ if(State.people().length===0){
+  const pos=html.lastIndexOf('<div class="empty">');
+  if(pos!==-1){
+   html=html.slice(0,pos)+
+   '<section class="v4-participant-empty" aria-label="Adicionar participantes">'+
+     '<div class="v4-participant-empty-icon">'+icon('people')+'</div>'+
+     '<div class="v4-participant-empty-copy"><h3>Nenhum participante cadastrado</h3>'+
+     '<p>Adicione quem vai participar da construção da melhoria.</p></div>'+
+     button('person-add',icon('plus')+'Adicionar participante','primary')+
+   '</section>';
+  }
+ }
+ return html;
+};
+if(State.data&&State.step===0)Render.page();
+})();
