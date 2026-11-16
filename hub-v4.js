@@ -53,3 +53,61 @@ Render.participants=function(){
 };
 if(State.data&&State.step===0)Render.page();
 })();
+
+/* Hub EMR Touch 4.4 — contextual chrome and structured dialogs.
+   Moves existing action buttons, leaving their commands and original DOM IDs intact. */
+(()=>{'use strict';
+const toolbar=document.querySelector('.top-actions');
+if(!toolbar||toolbar.querySelector('#v4Tools'))return;
+const settings=document.createElement('details');
+settings.id='v4Tools';settings.className='v4-tools';
+settings.innerHTML='<summary aria-label="Abrir ferramentas do encontro" title="Ferramentas do encontro">'+
+'<svg viewBox="0 0 24 24" aria-hidden="true" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="white"/><circle cx="15" cy="12" r="2" fill="white"/><circle cx="9" cy="17" r="2" fill="white"/></svg>'+
+'<span>Ferramentas</span></summary>'+
+'<div class="v4-tools-panel" role="group" aria-label="Ferramentas do encontro">'+
+'<div class="v4-tools-title">PREFERÊNCIAS E DADOS</div></div>';
+const panel=settings.querySelector('.v4-tools-panel');
+for(const id of ['sessionsIcon','densityBtn','dataBtn']){
+ const element=document.getElementById(id);
+ const button=id==='sessionsIcon'?element?.closest('button'):element;
+ if(button){
+   button.classList.add('v4-tools-item');
+   panel.appendChild(button);
+   if(button.id==='densityBtn')button.setAttribute('title','Alterar densidade da interface');
+ }
+}
+const fullscreen=document.getElementById('fullscreenBtn');
+toolbar.insertBefore(settings,fullscreen||null);
+const labels=[['#densityBtn','Escala da interface'],['#dataBtn','Importar / exportar backup']];
+for(const [selector,label] of labels){const b=panel.querySelector(selector);if(!b)continue;const span=document.createElement('span');span.className='v4-tools-item-label';span.textContent=label;if(selector==='#densityBtn')b.insertBefore(span,b.querySelector('#densityLabel'));else b.appendChild(span);}
+document.addEventListener('pointerdown',e=>{if(settings.open&&!settings.contains(e.target))settings.open=false},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&settings.open){settings.open=false;settings.querySelector('summary').focus()}},true);
+panel.addEventListener('click',e=>{if(e.target.closest('button'))settings.open=false});
+if(typeof Dialog!=='undefined'&&!Dialog.__hub44){
+ Dialog.__hub44=true;const originalOpen=Dialog.open.bind(Dialog);
+ const hints=[
+  [/participante/i,'Preencha os dados da pessoa que participará da maratona.'],
+  [/problema|demanda/i,'Descreva o problema com clareza para facilitar a priorização.'],
+  [/encontro|sessão/i,'Organize os dados e as configurações do encontro.'],
+  [/post-it|atividade|tarefa/i,'Defina a atividade e registre as informações necessárias.'],
+  [/revisão|relatório/i,'Confira as informações antes de finalizar o encontro.'],
+  [/PIN/i,'Acesso local do facilitador; não substitui autenticação corporativa.']
+ ];
+ Dialog.open=function(title,body,footer='',save=null){
+  originalOpen(title,body,footer,save);
+  const modal=document.getElementById('modal');const titleEl=modal?.querySelector('#modalTitle');
+  if(!titleEl)return;
+  const match=hints.find(([re])=>re.test(title));
+  const head=modal.querySelector('.modal-head');
+  if(!head)return;
+  head.classList.add('v4-modal-head');
+  const main=document.createElement('div');main.className='v4-modal-titlewrap';
+  const kicker=document.createElement('span');kicker.className='v4-modal-kicker';kicker.textContent='HUB EMR · FORMULÁRIO';
+  const desc=document.createElement('p');desc.className='v4-modal-description';desc.textContent=match?match[1]:'Confira os dados e confirme sua ação.';
+  titleEl.parentNode.insertBefore(main,titleEl);
+  main.append(kicker,titleEl,desc);
+  const bodyEl=modal.querySelector('.modal-body');if(bodyEl)bodyEl.classList.add('v4-modal-body');
+  const footerEl=modal.querySelector('.modal-foot');if(footerEl)footerEl.classList.add('v4-modal-footer');
+ };
+}
+})();
