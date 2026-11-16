@@ -6,7 +6,8 @@ if(typeof Render==='undefined'||typeof State==='undefined'||Render.__hub41)retur
 Render.__hub41=true;
 const meta=[['Preparação','Confirme quem participa da construção.'],['Descoberta','Registre problemas antes de discutir soluções.'],['Avaliação','Avalie cada problema nos seis critérios.'],['Decisão','Compare pontuações e confirme a prioridade do grupo.'],['Construção','Desenhe processos e distribua atividades.'],['Consolidação','Confira dados, indicadores e decisões.'],['Entrega','Revise o relatório executivo.'],['Continuidade','Retome oportunidades e seus históricos.']];
 const head=Render.head.bind(Render);
-Render.head=(i,actions='')=>'<div class="v4-journey" aria-label="Etapas do encontro">'+Steps.map(([name],j)=>'<button type="button" class="v4-stage '+(j===i?'current':j<i?'passed':'')+'" data-action="navigate" data-step="'+j+'" '+(j===i?'aria-current="step"':'')+' title="'+(j+1)+'. '+name+'"><span class="v4-stage-no">'+(j+1)+'</span><span class="v4-stage-text">'+name+'</span></button>').join('')+'</div>'+head(i,actions)+'<div class="v4-stage-context"><span class="v4-dot"></span><strong>'+meta[i][0]+'</strong><span>'+meta[i][1]+'</span><b>'+ (i+1)+'/8</b></div>';
+// Navegação única na lateral. O cabeçalho conserva o título e as ações originais.
+Render.head=(i,actions='')=>head(i,actions);
 const mapping=Render.mapping.bind(Render);
 Render.mapping=()=>{
  const html=mapping();if(!State.demands().length)return html;
