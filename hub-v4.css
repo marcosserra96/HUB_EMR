@@ -66,3 +66,88 @@ dialog{border-radius:22px;border:1px solid #d8e6ea;box-shadow:0 20px 90px #00293
 @media(max-width:900px){.v4-journey{grid-template-columns:repeat(4,minmax(0,1fr))}.v4-stage-text{font-size:10px!important}.v4-map-toolbar{flex-wrap:wrap}.v4-map-toolbar label{width:100%}.v4-ranking-header{flex-direction:column;align-items:flex-start}}
 @media(max-width:650px){.v4-journey{gap:4px}.v4-stage{min-height:55px!important;padding:5px 3px!important}.v4-stage-text{font-size:9px!important}.v4-stage-context{font-size:12px}.v4-progress-summary>div{padding:7px;flex-direction:column;gap:2px}.v4-progress-summary b{font-size:22px}.v4-progress-summary span{font-size:10px}.v4-map-cards .demand{min-height:unset}}
 @media print{.v4-journey,.v4-stage-context,.v4-map-toolbar,.v4-progress-summary,.v4-ranking-header{display:none!important}}
+
+/* Hub EMR Touch 4.2 — one navigation, fluid use of viewport height.
+   Min touch targets remain 44px even on short screens. */
+.v4-journey,.v4-stage-context{display:none!important}
+:root{--v4-space:clamp(10px,1.4vw,22px)}
+.app{grid-template-columns:clamp(184px,12vw,220px) minmax(0,1fr)}
+.sidebar{padding:clamp(14px,1.4vh,23px) 12px 12px;gap:clamp(12px,2.2vh,24px)}
+.wordmark{font-size:clamp(21px,1.65vw,27px);padding:0 9px}
+.nav{gap:clamp(3px,.55vh,7px)}
+.nav button{min-height:44px;padding:6px 9px;font-size:clamp(12px,.83vw,14px);line-height:1.25;gap:9px}
+.nav .num{width:29px;height:29px}
+.topbar{min-height:clamp(54px,7.2vh,72px);padding:7px clamp(12px,1.3vw,22px);gap:9px}
+.top-actions{gap:5px}
+.top-actions button{min-width:44px;min-height:44px;padding:7px 9px}
+.session-title{font-size:clamp(13px,1vw,16px)}
+.content{padding:clamp(12px,1.5vh,24px) clamp(14px,1.5vw,26px);max-width:1900px}
+.content.work-content{padding:8px 12px}
+.pagehead{margin-bottom:clamp(10px,1.3vh,17px);gap:12px}
+.pagehead h1{font-size:clamp(23px,1.8vw,30px)}
+.pagehead p{font-size:clamp(12px,.88vw,14px);margin-top:4px}
+.pagehead .eyebrow{font-size:10px;letter-spacing:1.3px;margin-bottom:4px}
+.pagehead .row{gap:6px}
+.pagehead button{min-height:44px;padding:8px 12px;gap:7px}
+.panel{padding:clamp(12px,1.35vw,20px)}
+.grid3,.grid2,.cards{gap:clamp(9px,1.1vw,15px)}
+.stat{min-height:clamp(72px,9.5vh,96px);padding:clamp(10px,1.1vw,15px);gap:12px}
+.stat b{font-size:clamp(27px,2.1vw,35px)}
+.stat p{font-size:clamp(12px,.88vw,14px)}
+.stat .symbol{width:clamp(42px,3vw,50px);height:clamp(42px,3vw,50px);border-radius:13px;flex-shrink:0}
+.stat .symbol svg{width:24px;height:24px}
+.empty{padding:clamp(18px,3.7vh,34px) clamp(15px,1.5vw,24px);gap:clamp(7px,1vh,12px);min-height:clamp(165px,29vh,270px)}
+.empty .emptyicon{width:52px;height:52px;border-radius:16px}
+.empty .emptyicon svg{width:25px;height:25px}
+.empty h3{font-size:clamp(15px,1.15vw,19px)}
+.empty p{font-size:clamp(12px,.92vw,14px);max-width:610px}
+.empty button{min-height:44px}
+.work-header{min-height:60px;padding:8px 12px;margin-bottom:8px}
+.work-content .work-toolbar{margin-bottom:7px;min-height:48px}
+.canvas{height:clamp(350px,calc(100dvh - 245px),1050px)}
+.kanban{min-height:clamp(350px,calc(100dvh - 245px),1050px)}
+.people-tray{max-height:calc(100dvh - 245px)}
+/* Respect original density controls without compromising touch targets */
+:is(.app[data-density="compact"],.app[data-density="dense"],.app[data-density="mini"],.app[data-density="micro"]) .content:not(.work-content){padding:clamp(10px,1.5vh,19px) clamp(12px,1.3vw,22px)}
+:is(.app[data-density="compact"],.app[data-density="dense"],.app[data-density="mini"],.app[data-density="micro"]) .pagehead{margin-bottom:clamp(10px,1.3vh,17px)}
+:is(.app[data-density="compact"],.app[data-density="dense"],.app[data-density="mini"],.app[data-density="micro"]) .stat{min-height:clamp(72px,9.5vh,96px);padding:clamp(9px,1vw,15px)}
+:is(.app[data-density="compact"],.app[data-density="dense"],.app[data-density="mini"],.app[data-density="micro"]) .stat b{font-size:clamp(27px,2.1vw,35px)}
+:is(.app[data-density="compact"],.app[data-density="dense"],.app[data-density="mini"],.app[data-density="micro"]) .empty{padding:clamp(18px,3.7vh,34px) 15px;min-height:clamp(165px,29vh,270px)}
+:is(.app[data-density="mini"],.app[data-density="micro"]) button{min-height:44px;min-width:44px}
+@media(max-height:850px){
+ .sidebar{gap:12px;padding-top:13px}
+ .sidefoot .offline-note{display:none}
+ .topbar{min-height:54px}
+ .pagehead p{font-size:12px}
+ .stat{min-height:72px}
+ .empty{min-height:165px;padding:17px 16px}
+ .empty .emptyicon{width:46px;height:46px}
+ .work-header{min-height:54px}
+}
+@media(max-height:680px){
+ .sidebar{gap:7px}.nav{gap:2px}.nav button{min-height:44px}
+ .pagehead{margin-bottom:9px}
+ .empty{min-height:140px;padding:12px;gap:7px}
+ .empty .emptyicon{width:40px;height:40px}
+ .stat{min-height:66px;padding:8px}
+ .stat .symbol{height:40px;width:40px}
+ .stat b{font-size:26px}
+}
+@media(max-width:1100px){
+ .app{grid-template-columns:76px minmax(0,1fr)}
+ .sidebar{padding:12px 7px}
+ .nav button{justify-content:center;padding:6px}
+ .nav .navlabel,.wordmark small,.sidefoot{display:none}
+ .wordmark{font-size:15px;text-align:center;padding:0}
+ .nav .num{width:33px;height:33px}
+}
+@media(max-width:650px){
+ .content{padding:10px}
+ .pagehead{align-items:flex-start}
+ .stat{min-height:70px}
+ .grid3{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .grid3>.stat:last-child{grid-column:1/-1}
+ .session-title{max-width:200px}
+ .top-actions{flex-wrap:wrap}
+ .empty{min-height:170px}
+}
