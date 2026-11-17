@@ -227,3 +227,18 @@ test('não troca de equipe enquanto alguém está arrastando no quadro', async (
   const cycle = d.cycles.find(c => c.id === before);
   expect(cycle.flows.asis.nodes[0].y).toBeGreaterThan(100);
 });
+
+test('excluir a demanda de uma equipe encerra o modo equipes quando sobra uma', async ({ page }) => {
+  await openApp(page);
+  await seed(page);
+  await startTeams(page);
+  await page.evaluate(() => Demands.remove(State.data.demands.find(x => x.title === 'Conciliação bancária').id));
+  await page.locator('#modal button[type="submit"]').click();
+  const d = await data(page);
+  expect(d.sessions[0].teams).toBeUndefined();
+  expect(d.cycles).toHaveLength(1);
+  expect(d.sessions[0].selectedCycleId).toBe(d.cycles[0].id);
+  const valid = await page.evaluate(() => { try { Transfer.validate(JSON.parse(JSON.stringify(State.data))); return true; } catch (e) { return e.message; } });
+  expect(valid).toBe(true);
+  await expect(page.locator('.team-bar')).toHaveCount(0);
+});
