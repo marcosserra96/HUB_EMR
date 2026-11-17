@@ -1,12 +1,49 @@
-# Hub EMR Touch 4.0 — Prévia
+# Hub de Melhoria & Automação · EMR
 
-Interface corporativa para maratonas de melhoria e automação. Regras de negócio da v3 preservadas; dados de sessões, participantes, fluxos e tarefas armazenados **no IndexedDB do navegador**. O código está disponível na Vercel como aplicativo estático/PWA; não há backend para dados de sessões.
+Quadro colaborativo para conduzir as maratonas de melhoria e automação da Energisa Minas Rio
+numa TV de toque. O grupo segue oito etapas: participantes, mapeamento, classificação, ranking,
+trabalho da demanda (fluxo AS IS / TO BE e kanban), revisão, relatório e backlog.
 
-## Migrar dados
-Antes de usar o novo endereço, exporte um JSON no aplicativo v3 e importe no v4. Cada origem (file://, localhost e URL de produção) usa armazenamento distinto. Não limpe os dados do navegador sem exportar backup.
+- **Offline:** depois do primeiro acesso, funciona sem internet (PWA).
+- **Dados locais:** tudo fica no navegador onde o encontro foi feito. Não há servidor nem
+  sincronização entre máquinas.
+- **Versão:** 6.0
+
+## Uso no encontro
+
+1. Abra o endereço publicado no navegador da TV (Edge ou Chrome) e use **Tela cheia**.
+2. Em **Ferramentas → Escala da interface**, ajuste o tamanho ao da TV.
+3. **Ao final, exporte um backup** em Ferramentas → Backup e dados. O app mostra a data do último
+   backup completo. Cada endereço (produção, localhost, arquivo local) tem uma base própria: para
+   levar os dados para outra máquina ou outro endereço, exporte e importe o JSON.
+4. Não limpe os dados do navegador sem exportar antes. Não coloque backups com informações reais
+   no repositório.
+
+Para teste rápido sem servidor, o `index.html` também abre direto do disco.
+
+## Atualização a partir da 4.x / 5.x
+
+Os dados continuam no mesmo banco do navegador: no mesmo endereço, a versão 6.0 abre tudo o que
+já estava lá, sem importar nada. Backups JSON das versões anteriores também são aceitos.
+
+## Desenvolvimento
+
+```bash
+npm install     # instala o Playwright (só para os testes)
+npm start       # http://localhost:8080
+npm test        # regras do método e interface (Playwright)
+npm run check   # verificações estáticas
+```
+
+Leia o [AGENTS.md](AGENTS.md) (arquitetura e regras) e o
+[design system](design-system/hub-emr/MASTER.md) antes de alterar o código.
 
 ## Publicação
-Projeto Vercel com framework Other e diretório raiz /. Arquivos servidos estaticamente. Teste primeiro online; a aplicação fica disponível offline após cache do PWA. Não há sincronização entre máquinas.
 
-## Status
-Versão de testes. Funcionalidade multitoque na TV física e importação real ainda exigem validação. Não coloque backups ou informações corporativas reais no repositório.
+Vercel, site estático (framework "Other", raiz `/`). Não há etapa de build. Ao publicar uma
+versão nova, siga o passo a passo de versão do AGENTS.md para que as TVs recebam os arquivos novos.
+
+## Pendências conhecidas
+
+- O multitoque e os gestos dependem da tela e do navegador. Valide-os na TV física antes de cada
+  encontro.

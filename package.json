@@ -1,0 +1,14 @@
+{
+  "name": "hub-emr",
+  "private": true,
+  "version": "6.0.0",
+  "description": "Hub de Melhoria & Automação EMR — quadro colaborativo offline (PWA estático, sem build)",
+  "scripts": {
+    "start": "node scripts/serve.mjs 8080",
+    "test": "playwright test",
+    "check": "node scripts/check.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}
