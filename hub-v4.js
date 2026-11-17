@@ -15,12 +15,12 @@ Render.mapping=()=>{
 };
 const classification=Render.classification.bind(Render);
 Render.classification=()=>{
- const html=classification(),ds=State.demands(),complete=ds.filter(Classification.complete).length;
+ const html=classification(),ds=State.activeDemands(),complete=ds.filter(Classification.complete).length;
  return html.replace('<div class="progress">','<div class="v4-progress-summary"><div><b>'+ds.length+'</b><span>Oportunidades</span></div><div><b>'+complete+'</b><span>Avaliadas</span></div><div><b>'+(ds.length-complete)+'</b><span>Pendentes</span></div><p>Escolha um problema, avalie os seis critérios e avance.</p></div><div class="progress">');
 };
 const ranking=Render.ranking.bind(Render);
 Render.ranking=()=>{
- const html=ranking(),ds=State.demands().filter(d=>d.status!=='Arquivada');
+ const html=ranking(),ds=State.activeDemands();
  return html.replace('<div class="hint" style="margin-bottom:16px">','<div class="v4-ranking-header"><div><small>RESULTADO DO GRUPO</small><strong>'+ds.filter(Classification.complete).length+' de '+ds.length+' oportunidades avaliadas</strong></div><span>Prioridade baseada nos pesos existentes</span></div><div class="hint" style="margin-bottom:16px">');
 };
 document.addEventListener('input',e=>{if(e.target?.id!=='v4MapSearch')return;const term=e.target.value.trim().toLocaleLowerCase('pt-BR');let found=0;document.querySelectorAll('#v4MapCards .demand').forEach(el=>{const show=el.textContent.toLocaleLowerCase('pt-BR').includes(term);el.hidden=!show;if(show)found++});const el=document.querySelector('#v4MapCount');if(el)el.textContent=found+' resultado'+(found===1?'':'s');});
@@ -136,7 +136,7 @@ Render.navigation=function(){
 const participantRender=Render.participants.bind(Render);
 Render.participants=function(){
  let html=participantRender();
- const people=State.people(), demands=State.demands(),rated=demands.filter(Classification.complete).length;
+ const people=State.people(), demands=State.activeDemands(),rated=demands.filter(Classification.complete).length;
  const cycle=State.cycle(),done=cycle?.tasks?.filter(t=>t.column==='done'&&!t.cancelled).length||0;
  const total=cycle?.tasks?.length||0;
  const title=State.session()?.title||'Encontro de melhoria';
