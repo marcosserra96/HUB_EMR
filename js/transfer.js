@@ -20,7 +20,7 @@ const Transfer = {
                 arr(r.include, path + '.include', 14);
                 if (r.include.length !== 14 || r.include.some(v => typeof v !== 'boolean')) fail(path + ': seções inválidas.')
             };
-        if (!obj(raw) || raw.format !== 'emr-touch-board' || raw.version !== 3) fail('Formato incompatível. Use um JSON exportado pelo Touch Board v3.');
+        if (!obj(raw) || raw.format !== 'emr-touch-board' || raw.version !== 3) fail('Formato incompatível. Use um backup JSON exportado pelo Hub EMR.');
         const checkDomain = (d, path = 'dados') => {
             for (const key of ['sessions', 'participants', 'demands', 'cycles']) {
                 arr(d[key], path + '.' + key);
@@ -136,7 +136,7 @@ const Transfer = {
                 }
         };
         scan(raw);
-        if (raw.ui !== undefined && (!obj(raw.ui) || typeof raw.ui.sidebarCollapsed !== 'boolean' || raw.ui.density !== undefined && !['comfortable', 'compact', 'dense', 'mini', 'micro'].includes(raw.ui.density) || raw.ui.keyboardWidth !== undefined && (!Number.isFinite(raw.ui.keyboardWidth) || raw.ui.keyboardWidth < 320 || raw.ui.keyboardWidth > 720) || raw.ui.keyboardNumericWidth !== undefined && (!Number.isFinite(raw.ui.keyboardNumericWidth) || raw.ui.keyboardNumericWidth < 220 || raw.ui.keyboardNumericWidth > 420))) fail('Preferência de interface inválida.');
+        if (raw.ui !== undefined && (!obj(raw.ui) || typeof raw.ui.sidebarCollapsed !== 'boolean' || raw.ui.density !== undefined && !['comfortable', 'compact', 'dense', 'mini', 'micro'].includes(raw.ui.density) || raw.ui.keyboardWidth !== undefined && (!Number.isFinite(raw.ui.keyboardWidth) || raw.ui.keyboardWidth < 320 || raw.ui.keyboardWidth > 720) || raw.ui.keyboardNumericWidth !== undefined && (!Number.isFinite(raw.ui.keyboardNumericWidth) || raw.ui.keyboardNumericWidth < 220 || raw.ui.keyboardNumericWidth > 420) || raw.ui.lastBackupAt !== undefined && (typeof raw.ui.lastBackupAt !== 'string' || Number.isNaN(Date.parse(raw.ui.lastBackupAt))))) fail('Preferência de interface inválida.');
         checkDomain(raw);
         arr(raw.undo, 'Desfazer', 30);
         raw.undo.forEach(x => {
@@ -180,9 +180,15 @@ const Transfer = {
             }),
             a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'EMR_Touch_v3_' + (scope === 'all' ? 'backup_completo' : 'sessao') + '_' + Utils.date() + '.json';
+        a.download = 'HubEMR_' + (scope === 'all' ? 'backup_completo' : 'sessao') + '_' + Utils.date() + '.json';
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        if (scope === 'all') {
+            /* Lembrete de backup: guardado só como preferência deste navegador. */
+            State.data.ui = { ...State.data.ui, lastBackupAt: now() };
+            History.persist();
+            Render.backupStatus()
+        }
         Feedback.toast(scope === 'all' ? 'Backup completo exportado.' : 'Sessão exportada com sua origem e ciclos vinculados.')
     },
     async read(file) {

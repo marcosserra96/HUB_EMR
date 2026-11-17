@@ -16,7 +16,16 @@ const Render = {
         $('#undoBtn').disabled = !last;
         $('#undoBtn').title = last ? 'Desfazer: ' + last.label : 'Nada para desfazer';
         $('#undoBtn').setAttribute('aria-label', $('#undoBtn').title);
+        this.backupStatus();
         this.navigation()
+    },
+    /** Data do último backup completo, mostrada em Ferramentas. */
+    backupStatus() {
+        const at = State.data.ui?.lastBackupAt,
+            el = $('#backupStatus');
+        if (!el) return;
+        el.textContent = at ? 'Último: ' + new Date(at).toLocaleDateString('pt-BR') : 'Nenhum backup exportado';
+        el.classList.toggle('warn', !at)
     },
     /** Indicadores de conclusão de cada etapa (usados no menu). */
     progress() {
@@ -154,7 +163,7 @@ const Render = {
             resolved = ties.length <= 1 || ties.some(x => x.tieOrder !== null),
             cycle = State.cycle(),
             working = State.demand();
-        const actions = cycle ? button('navigate', 'Abrir trabalho' + icon('arrow'), 'secondary', 'data-step="4"') : '';
+        const actions = cycle && working?.id !== first?.id ? button('navigate', 'Abrir trabalho' + icon('arrow'), 'secondary', 'data-step="4"') : '';
         if (!active.length) return this.head(3, actions) + empty('O ranking nasce da avaliação', 'Registre e classifique as demandas para comparar as prioridades.', 'mapping-go', 'Abrir mapeamento', 'trophy') + this.stepFoot(3);
         const rule = `<p class="rule">${icon('info')}<span>Nota de cada critério = nota ÷ 5 × peso; a soma vai de 0 a 100. Desempate: Impacto, depois Viabilidade, depois decisão do grupo.</span></p>`;
         const pending = incomplete.length ? notice(`<b>${plural(incomplete.length,'demanda ainda não foi classificada','demandas ainda não foram classificadas')}.</b> ${incomplete.length===1?'Ela fica':'Elas ficam'} fora do ranking até a classificação ser concluída.`, 'warning', button('navigate', 'Completar classificação', 'secondary small', 'data-step="2"')) : '';
@@ -164,7 +173,7 @@ const Render = {
                 inWork = working?.id === d.id,
                 open = State.expanded.has(d.id);
             const canConfirm = top && resolved;
-            return `<article class="card rank-card${top?' recommended':''}"><div class="rank-position" aria-label="Posição ${i+1}">${i+1}</div><div class="rank-main"><div class="rank-badges">${badge(esc(d.area),'outline')}${top?badge(icon('trophy')+'Recomendada','accent'):''}${inWork?badge('Em trabalho','info'):''}${d.tieOrder===0?badge('Escolhida no desempate','info'):''}</div><h3>${esc(d.title)}</h3>${top?`<div class="rank-actions">${button('rank-confirm',icon('check')+(inWork?'Iniciar novo ciclo':'Confirmar demanda'),'accent',`data-id="${d.id}" ${canConfirm?'':'disabled'}`)}</div>`:''}${top&&!resolved?'<p class="rank-wait">Resolva o empate acima para confirmar.</p>':''}</div>${button('rank-expand',(open?'Ocultar notas':'Ver notas'),'ghost small rank-toggle',`data-id="${d.id}" aria-expanded="${open}"`)}<div class="rank-score"><b>${Utils.number(Classification.score(d))}</b><span>pontos</span></div>${open?`<div class="rank-detail">${Criteria.map(([name,weight],j)=>`<div class="rank-crit"><span>${name} · ${weight}%</span><b>${d.ratings[j]}/5</b><small>${Utils.number(d.ratings[j]/5*weight)} pts</small></div>`).join('')}</div>`:''}</article>`
+            return `<article class="card rank-card${top?' recommended':''}"><div class="rank-position" aria-label="Posição ${i+1}">${i+1}</div><div class="rank-main"><div class="rank-badges">${badge(esc(d.area),'outline')}${top?badge(icon('trophy')+'Recomendada','accent'):''}${inWork?badge('Em trabalho','info'):''}${d.tieOrder===0?badge('Escolhida no desempate','info'):''}</div><h3>${esc(d.title)}</h3>${top?`<div class="rank-actions">${inWork?button('navigate','Abrir trabalho'+icon('arrow'),'accent','data-step="4"')+button('rank-confirm','Iniciar novo ciclo','ghost',`data-id="${d.id}" ${canConfirm?'':'disabled'}`):button('rank-confirm',icon('check')+'Confirmar demanda','accent',`data-id="${d.id}" ${canConfirm?'':'disabled'}`)}</div>`:''}${top&&!resolved?'<p class="rank-wait">Resolva o empate acima para confirmar.</p>':''}</div>${button('rank-expand',(open?'Ocultar notas':'Ver notas'),'ghost small rank-toggle',`data-id="${d.id}" aria-expanded="${open}"`)}<div class="rank-score"><b>${Utils.number(Classification.score(d))}</b><span>pontos</span></div>${open?`<div class="rank-detail">${Criteria.map(([name,weight],j)=>`<div class="rank-crit"><span>${name} · ${weight}%</span><b>${d.ratings[j]}/5</b><small>${Utils.number(d.ratings[j]/5*weight)} pts</small></div>`).join('')}</div>`:''}</article>`
         }).join('');
         const rest = incomplete.length ? `<div class="section-head"><h2>Aguardando classificação</h2><span class="count">${plural(incomplete.length,'demanda')}</span></div><div class="stack-list">${incomplete.map(d=>`<article class="card rank-pending"><div><h3>${esc(d.title)}</h3><p>${esc(d.area)} · ${(n=>n?n+' de 6 critérios · '+Utils.number(Classification.score(d))+' pontos parciais':'sem notas')(d.ratings.filter(n=>n!==null).length)}</p></div>${button('backlog-classify','Classificar','secondary small',`data-id="${d.id}"`)}</article>`).join('')}</div>` : '';
         return this.head(3, actions) + rule + pending + tieBlocks + (ranked.length ? `<div class="stack-list">${rows}</div>` : empty('Nenhuma demanda classificada', 'Conclua a classificação de ao menos uma demanda para montar o ranking.', '', '', 'trophy')) + rest + this.stepFoot(3)
@@ -204,7 +213,7 @@ const Render = {
 
     /* 8 · Backlog */
     backlog() {
-        return this.head(7, button('cycle-history', icon('history') + 'Histórico de ciclos', 'secondary')) + `<div class="toolbar"><label class="search"><span class="visually-hidden">Buscar no backlog</span>${icon('search')}<input id="backlogSearch" type="search" placeholder="Buscar por título, área ou descrição" value="${esc(State.filter)}" autocomplete="off"></label><label class="select-inline"><span class="visually-hidden">Filtrar por status</span><select id="backlogStatus">${options([['','Todos os status'],...Statuses],State.statusFilter)}</select></label></div><div id="backlogResults" aria-live="polite"></div>` + this.stepFoot(7)
+        return this.head(7, button('cycle-history', icon('history') + 'Histórico de ciclos', 'secondary')) + `<div class="toolbar"${State.data.demands.length?'':' hidden'}><label class="search"><span class="visually-hidden">Buscar no backlog</span>${icon('search')}<input id="backlogSearch" type="search" placeholder="Buscar por título, área ou descrição" value="${esc(State.filter)}" autocomplete="off"></label><label class="select-inline"><span class="visually-hidden">Filtrar por status</span><select id="backlogStatus">${options([['','Todos os status'],...Statuses],State.statusFilter)}</select></label></div><div id="backlogResults" aria-live="polite"></div>` + this.stepFoot(7)
     },
     backlogResults() {
         const root = $('#backlogResults');
@@ -219,7 +228,7 @@ const Render = {
             const s = State.data.sessions.find(x => x.id === d.originSessionId),
                 done = Classification.complete(d),
                 archived = d.status === 'Arquivada';
-            const main = archived ? button('demand-restore', icon('restore') + 'Restaurar', 'secondary', `data-id="${d.id}"`) : done ? button('backlog-start', 'Iniciar novo ciclo', 'primary', `data-id="${d.id}"`) : button('backlog-classify', 'Completar classificação', 'secondary', `data-id="${d.id}"`);
+            const main = archived ? button('demand-restore', icon('restore') + 'Restaurar', 'secondary', `data-id="${d.id}"`) : State.demand()?.id === d.id ? button('navigate', 'Abrir trabalho' + icon('arrow'), 'primary', 'data-step="4"') : done ? button('backlog-start', 'Iniciar novo ciclo', 'primary', `data-id="${d.id}"`) : button('backlog-classify', 'Completar classificação', 'secondary', `data-id="${d.id}"`);
             return `<article class="card demand-card${archived?' archived':''}"><div class="card-top">${badge(esc(d.area),'outline')}${badge(esc(d.status),statusTone(d.status))}</div><h3>${esc(d.title)}</h3><p class="desc">${esc(d.description)||'<span class="muted">Sem descrição.</span>'}</p><dl class="meta"><div><dt>Pontuação</dt><dd>${done?'<b>'+Utils.number(Classification.score(d))+'</b> de 100':'Classificação incompleta'}</dd></div><div><dt>Origem</dt><dd>${esc(s?.title||'—')} · ${fmt(d.createdAt)}</dd></div><div><dt>Histórico</dt><dd>${plural(d.selections.length,'ciclo')} · ${plural(d.history.length,'alteração','alterações')}</dd></div></dl><footer class="card-foot">${main}<div class="card-actions">${actionMenu('Mais ações para '+d.title,[{action:'demand-history',label:'Ver histórico',icon:'history',attrs:`data-id="${d.id}"`},{action:'backlog-edit',label:'Editar',icon:'edit',attrs:`data-id="${d.id}"`},{action:'backlog-status',label:'Alterar status',icon:'flag',attrs:`data-id="${d.id}"`},archived?false:{action:'demand-archive',label:'Arquivar',icon:'archive',attrs:`data-id="${d.id}"`},null,{action:'demand-delete',label:'Excluir',icon:'trash',danger:true,attrs:`data-id="${d.id}"`}])}</div></footer></article>`
         }).join('')}</div>` : `<div class="empty compact"><h2>Nenhuma demanda encontrada</h2><p>Ajuste a busca ou o filtro de status.</p></div>`
     }

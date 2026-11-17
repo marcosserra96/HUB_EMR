@@ -36,6 +36,7 @@
   --color-text-secondary: #40575f;   /* parágrafos e descrições */
   --color-text-muted: #56696f;       /* metadados e rótulos pequenos (mínimo AA) */
   --color-on-primary: #ffffff;
+  --color-white: #ffffff;              /* texto sobre fundos coloridos e superfícies do quadro */
 
   /* Superfícies e bordas */
   --color-bg: #f2f6f7;

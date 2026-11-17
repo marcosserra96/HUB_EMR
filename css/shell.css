@@ -88,6 +88,7 @@
 }
 .tools-item { justify-content: flex-start; width: 100%; gap: var(--space-3); border-color: transparent; text-align: left; padding: var(--space-2) var(--space-3); min-height: 3.75rem; }
 .tools-item:hover { background: var(--color-bg-subtle); border-color: transparent; }
+.tools-item small.warn { color: var(--color-on-warning-subtle); font-weight: var(--weight-semibold); }
 .tools-scale { margin-top: var(--space-1); padding: var(--space-3); border-top: 1px solid var(--color-border-subtle); }
 .tools-scale-head { display: flex; justify-content: space-between; margin-bottom: var(--space-2); font-size: var(--text-sm); }
 .tools-scale-head span { color: var(--color-text-muted); font-variant-numeric: tabular-nums; }

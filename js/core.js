@@ -87,7 +87,11 @@ const button = (action, text, kind = '', attrs = '') => `<button type="button" c
 /** "1 demanda" / "3 demandas". Nunca escreva "demanda(s)". */
 const plural = (n, singular, pluralForm = singular + 's') => `${Number(n).toLocaleString('pt-BR')} ${n === 1 ? singular : pluralForm}`;
 /** Estado vazio: ícone, título, texto e (opcional) a ação principal. */
-const empty = (title, text, action = '', label = '', sym = 'list') => `<div class="empty"><div class="empty-icon">${icon(sym)}</div><h2>${title}</h2><p>${text}</p>${action?button(action,icon('plus')+label,'primary'):''}</div>`;
+const empty = (title, text, action = '', label = '', sym = 'list') => {
+    /* Ações de navegação (…-go) levam seta; ações de criar, sinal de mais. */
+    const go = /-go$/.test(action);
+    return `<div class="empty"><div class="empty-icon">${icon(sym)}</div><h2>${title}</h2><p>${text}</p>${action?button(action,go?label+icon('arrow'):icon('plus')+label,go?'secondary':'primary'):''}</div>`
+};
 /** Selo. tone: '' | 'success' | 'warning' | 'danger' | 'accent' | 'info' | 'outline' */
 const badge = (text, tone = '', attrs = '') => `<span class="badge${tone?' '+tone:''}" ${attrs}>${text}</span>`;
 /** Menu "⋯" com as ações de um item. items: [{action, label, icon, attrs, danger}] — use null para separador. */

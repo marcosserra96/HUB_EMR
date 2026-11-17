@@ -33,7 +33,7 @@
       <p class="version">Hub EMR <span data-app-version></span> · dados locais</p>
     </div>
   </aside>
-  <div class="scrim" data-action="toggle-sidebar" aria-hidden="true"></div>
+  <div class="scrim" data-action="close-drawer" aria-hidden="true"></div>
   <div class="main">
     <header class="topbar">
       <button type="button" class="icon-button" data-action="toggle-sidebar" id="menuToggle" aria-controls="navigation" aria-expanded="true" aria-label="Recolher menu"></button>
@@ -48,7 +48,7 @@
           <summary class="secondary" aria-label="Ferramentas do encontro" title="Ferramentas do encontro" data-icon="sliders"><span class="optional-label">Ferramentas</span></summary>
           <div class="tools-panel" role="group" aria-label="Ferramentas do encontro">
             <button type="button" class="tools-item" data-action="sessions" data-icon="folder"><span class="sel-text"><b>Sessões</b><small>Abrir ou criar encontros</small></span></button>
-            <button type="button" class="tools-item" data-action="data" data-icon="download"><span class="sel-text"><b>Backup e dados</b><small>Exportar ou importar JSON</small></span></button>
+            <button type="button" class="tools-item" data-action="data" data-icon="download"><span class="sel-text"><b>Backup e dados</b><small id="backupStatus">Exportar ou importar JSON</small></span></button>
             <div class="tools-scale">
               <div class="tools-scale-head"><b>Escala da interface</b><span id="densityValue">85%</span></div>
               <div class="scale-options" id="densityOptions" role="group" aria-label="Escala da interface"></div>

@@ -10,6 +10,7 @@ const Commands = {
         Dialog.close()
     },
     'toggle-sidebar': () => Layout.toggle(),
+    'close-drawer': () => Layout.closeDrawer(),
     'ui-density': b => Layout.setDensity(b.dataset.density),
     'map-filter': b => {
         State.mapFilter = b.dataset.filter;

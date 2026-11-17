@@ -187,3 +187,14 @@ test('PIN do facilitador bloqueia a revisão', async ({ page }) => {
   await page.locator('#modal button[type="submit"]').click();
   await expect(page.locator('#navigation [aria-current="step"]')).toHaveAttribute('data-step', '5');
 });
+
+test('backup completo registra a data e aparece em Ferramentas', async ({ page }) => {
+  await openApp(page);
+  await expect(page.locator('#backupStatus')).toHaveText('Nenhum backup exportado');
+  const download = page.waitForEvent('download');
+  await page.evaluate(() => Transfer.export('all'));
+  expect((await download).suggestedFilename()).toMatch(/^HubEMR_backup_completo_\d{4}-\d{2}-\d{2}\.json$/);
+  await expect(page.locator('#backupStatus')).toHaveText(/^Último: \d{2}\/\d{2}\/\d{4}$/);
+  const ok = await page.evaluate(() => { try { Transfer.validate(JSON.parse(JSON.stringify(State.data))); return true; } catch { return false; } });
+  expect(ok).toBe(true);
+});

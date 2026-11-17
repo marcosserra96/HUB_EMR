@@ -17,11 +17,11 @@
 .kbd-keys { display: flex; flex-direction: column; gap: 4px; overflow: auto; }
 .kbd-row { display: flex; justify-content: center; gap: 4px; }
 .kbd-row:nth-child(3) { padding: 0 16px; }
-.kbd-key { flex: 1; min-width: 0; height: var(--kbd-key-h, 40px); padding: 3px; border-radius: 8px; border-color: var(--color-border); background: #fff; color: var(--color-text); font-size: var(--kbd-font, 15px); font-weight: 600; touch-action: none; }
+.kbd-key { flex: 1; min-width: 0; height: var(--kbd-key-h, 40px); padding: 3px; border-radius: 8px; border-color: var(--color-border); background: var(--color-white); color: var(--color-text); font-size: var(--kbd-font, 15px); font-weight: 600; touch-action: none; }
 .kbd-function { background: var(--color-bg-inset); color: var(--color-primary); font-size: calc(var(--kbd-font, 15px) - 2px); }
 .kbd-top > .kbd-key { flex: 0 0 var(--kbd-key-h, 40px); padding: 3px; }
 .kbd-key.kbd-space { flex: 4; font-size: calc(var(--kbd-font, 15px) - 3px); }
-.kbd-enter { flex: 1.4; background: var(--color-primary); border-color: var(--color-primary); color: #fff; font-size: calc(var(--kbd-font, 15px) - 2px); }
+.kbd-enter { flex: 1.4; background: var(--color-primary); border-color: var(--color-primary); color: var(--color-white); font-size: calc(var(--kbd-font, 15px) - 2px); }
 .kbd-number-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
 .touch-keyboard.numeric { width: 236px; }
 .kbd-number-grid .kbd-key { min-width: 0; font-size: var(--kbd-font, 15px); }
