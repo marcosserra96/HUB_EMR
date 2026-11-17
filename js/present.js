@@ -26,7 +26,7 @@ const Presenter = {
         layer.setAttribute('aria-labelledby', 'presentTitle');
         layer.innerHTML = `<div class="present-scrim" data-action="present-close"></div><div class="present-move"><div class="present-flip"><div class="present-face present-front" aria-hidden="true"></div><div class="present-face present-back"></div></div></div>`;
         document.body.append(layer);
-        document.body.classList.add('presenting');
+        document.documentElement.classList.add('presenting');
         this.layer = layer;
         this.fill();
         this.bindSwipe();
@@ -104,7 +104,7 @@ const Presenter = {
             source = this.card(this.ids[this.index]);
         const finish = () => {
             layer.remove();
-            document.body.classList.remove('presenting');
+            document.documentElement.classList.remove('presenting');
             $$('#mapResults .presented').forEach(x => x.classList.remove('presented'));
             source?.querySelector('.card-open')?.focus({ preventScroll: true });
             if (this.layer === layer) this.layer = null;

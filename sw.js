@@ -1,6 +1,6 @@
 /* Hub EMR · Service worker: rede primeiro, cache como reserva para uso offline.
    Ao publicar uma versão, mude CACHE (e APP_VERSION em js/core.js) para renovar os arquivos. */
-const CACHE = 'hub-emr-v6-1';
+const CACHE = 'hub-emr-v6-1-1';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './icon.svg', './assets/energisa-logo.svg',
   './css/tokens.css', './css/base.css', './css/shell.css', './css/components.css',

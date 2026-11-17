@@ -230,6 +230,8 @@ test('tocar no card apresenta a demanda inteira, navega e volta ao lugar', async
   await expect(layer.locator('#presentTitle')).toHaveText('Leituras atípicas');
   await expect(layer.locator('.present-desc')).toContainText('Texto longo que no card fica cortado');
   await expect(page.locator('.demand-card.presented')).toHaveCount(1);
+  /* Trava a rolagem mantendo o espaço da barra, para o fundo não se deslocar. */
+  expect(await page.evaluate(() => { const cs = getComputedStyle(document.documentElement); return [document.documentElement.classList.contains('presenting'), cs.overflowY, cs.scrollbarGutter]; })).toEqual([true, 'hidden', 'stable']);
   await page.keyboard.press('ArrowRight');
   await expect(layer.locator('#presentTitle')).toHaveText('Ordens impressas');
   await expect(layer.locator('.present-count')).toHaveText('2 de 3');
@@ -238,6 +240,7 @@ test('tocar no card apresenta a demanda inteira, navega e volta ao lugar', async
   await page.mouse.click(20, 1060);
   await expect(layer).toHaveCount(0);
   await expect(page.locator('.demand-card.presented')).toHaveCount(0);
+  await expect(page.locator('html')).not.toHaveClass(/presenting/);
   await expect(page.locator('.demand-card').first()).toBeVisible();
 });
 
