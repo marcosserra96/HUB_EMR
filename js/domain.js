@@ -112,7 +112,7 @@ const Teams = {
         const first = State.data.demands.find(x => x.id === firstId);
         const others = Ranking.sort(State.activeDemands().filter(d => Classification.complete(d) && d.id !== firstId));
         if (!others.length) return Feedback.toast('Classifique mais uma demanda para trabalhar com duas equipes.');
-        Dialog.open('Trabalhar com duas demandas', `<p>O grupo se divide em duas equipes, cada uma com a sua demanda, fluxo e kanban. Na tela de trabalho, abas alternam entre a visão geral e cada equipe.</p><div class="pair-first">${teamDot('blue')}<span class="sel-text"><small>Equipe azul</small><b>${esc(first.title)}</b></span><span class="pair-score">${Utils.number(Classification.score(first))} pts</span></div><fieldset class="fieldset"><legend>Demanda da equipe laranja</legend><div class="selection-list">${others.map((d,i)=>`<label class="check pair-option"><input type="radio" name="second" value="${d.id}" ${i===0?'checked':''}><span class="sel-text"><b>${esc(d.title)}</b><small>${esc(d.area)}${i===0?' · próxima do ranking':''}</small></span><span class="pair-score">${Utils.number(Classification.score(d))} pts</span></label>`).join('')}</div></fieldset>${State.cycle()?notice('O ciclo em andamento continua salvo no histórico.','info'):''}`, saveFooter('Confirmar e montar equipes'), () => {
+        Dialog.open('Trabalhar com duas demandas', `<p>O grupo se divide em duas equipes, cada uma com a sua demanda, fluxo e kanban. Na tela de trabalho, abas alternam entre a visão geral e cada equipe.</p><div class="pair-first">${teamDot('blue')}<span class="sel-text"><small>Equipe azul</small><b>${esc(first.title)}</b></span><span class="pair-score">${Utils.number(Classification.score(first))} pts</span></div><fieldset class="fieldset"><legend>Demanda da equipe laranja</legend><div class="selection-list">${others.map((d,i)=>`<label class="check pair-option"><input type="radio" name="second" value="${d.id}" ${i===0?'checked':''}><span class="sel-text"><b>${esc(d.title)}</b><small>${esc(d.area)}${i===0?' · próxima do ranking':''}</small></span><span class="pair-score">${Utils.number(Classification.score(d))} pts</span></label>`).join('')}</div></fieldset>${State.cycle()?.demandId===first.id?notice('O fluxo e as atividades já feitos nesta demanda continuam com a equipe azul.','info'):State.cycle()?notice('O ciclo em andamento continua salvo no histórico.','info'):''}`, saveFooter('Confirmar e montar equipes'), () => {
             const second = State.data.demands.find(x => x.id === new FormData($('#modalForm')).get('second'));
             if (!second) return Dialog.error('Escolha a segunda demanda.');
             Dialog.close();
@@ -124,7 +124,9 @@ const Teams = {
             Ranking.releaseCurrent(demands.map(d => d.id));
             const colors = Object.keys(TeamColors);
             const s = State.session();
-            s.teams = demands.map((d, i) => ({ cycleId: Ranking.newCycle(d).id, name: 'Equipe ' + TeamColors[colors[i]], color: colors[i], memberIds: [] }));
+            /* Se a demanda já estava em trabalho (uma equipe só), a equipe aproveita o ciclo atual. */
+            const current = State.teamMode() ? null : State.cycle();
+            s.teams = demands.map((d, i) => ({ cycleId: current?.demandId === d.id ? current.id : Ranking.newCycle(d).id, name: 'Equipe ' + TeamColors[colors[i]], color: colors[i], memberIds: [] }));
             s.selectedCycleId = s.teams[0].cycleId;
             /* Modo imersivo: o menu recolhe para dar espaço às abas (a pessoa pode reabrir). */
             State.data.ui = { ...State.data.ui, sidebarCollapsed: true }
@@ -137,6 +139,10 @@ const Teams = {
     },
     /** Abre a aba da equipe (ou a visão geral / montagem). Não entra no desfazer. */
     open(tab, cycleId = null) {
+        /* Com alguém arrastando ou desenhando um gesto, trocar o quadro quebraria a ação em andamento. */
+        if (Pointers.active.size || Gestures.pending.size) return Feedback.toast('Finalize os toques antes de trocar de equipe.');
+        /* Vindo de um ciclo do histórico, visão geral e montagem voltam para a primeira equipe. */
+        if (!cycleId && !State.team()) cycleId = State.teams()[0]?.cycleId;
         State.workTab = tab;
         if (cycleId && cycleId !== State.session().selectedCycleId) {
             State.session().selectedCycleId = cycleId;

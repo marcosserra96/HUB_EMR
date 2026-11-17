@@ -177,3 +177,53 @@ test.describe('celular', () => {
     }
   });
 });
+
+test('de um ciclo do histórico, visão geral e "Voltar às equipes" voltam para as equipes', async ({ page }) => {
+  await openApp(page);
+  await seed(page);
+  await action(page, 'rank-confirm').click();
+  await submitModal(page);
+  const firstCycle = (await data(page)).cycles[0].id;
+  await page.evaluate(() => { State.step = 3; Render.header(); Render.page(); });
+  await startTeams(page, 'Ordens impressas');
+  /* A demanda que já estava em trabalho leva o ciclo atual para a equipe azul. */
+  expect((await data(page)).sessions[0].teams[0].cycleId).toBe(firstCycle);
+  await page.evaluate(() => Teams.end());
+  await submitModal(page);
+  await page.evaluate(() => { State.step = 3; Render.header(); Render.page(); });
+  await page.evaluate(() => Ranking.start(State.data.demands[0]));
+  const oldCycle = firstCycle;
+  await page.evaluate(() => { State.step = 3; Render.header(); Render.page(); });
+  await startTeams(page, 'Ordens impressas');
+  await page.evaluate(id => Sessions.openCycle(id), oldCycle);
+  await expect(page.locator('#content')).toContainText('ciclo anterior');
+  await expect(page.locator('#flowCanvas')).toBeVisible();
+  await action(page, 'team-tab', '[data-tab="overview"]').first().click();
+  await expect(page.locator('h1')).toHaveText('Visão geral das equipes');
+  const d = await data(page);
+  expect(d.sessions[0].teams.map(t => t.cycleId)).toContain(d.sessions[0].selectedCycleId);
+  await page.evaluate(id => Sessions.openCycle(id), oldCycle);
+  await page.locator('.notice [data-action="team-tab"]').click();
+  await expect(page.locator('h1')).toHaveText('Visão geral das equipes');
+});
+
+test('não troca de equipe enquanto alguém está arrastando no quadro', async ({ page }) => {
+  await openApp(page);
+  await seed(page);
+  await startTeams(page);
+  await action(page, 'team-tab', '[data-tab="team"][data-team="blue"]').click();
+  await action(page, 'flow-add').click();
+  await submitModal(page, { title: 'Etapa azul' });
+  const before = (await data(page)).sessions[0].selectedCycleId;
+  const node = await page.locator('[data-node-id]').boundingBox();
+  await page.mouse.move(node.x + node.width / 2, node.y + node.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(node.x + node.width / 2 + 40, node.y + node.height / 2 + 40, { steps: 4 });
+  await page.evaluate(() => Teams.open('team', State.teams()[1].cycleId));
+  expect((await data(page)).sessions[0].selectedCycleId).toBe(before);
+  await page.mouse.move(node.x + node.width / 2 + 80, node.y + node.height / 2 + 120, { steps: 4 });
+  await page.mouse.up();
+  const d = await data(page);
+  const cycle = d.cycles.find(c => c.id === before);
+  expect(cycle.flows.asis.nodes[0].y).toBeGreaterThan(100);
+});

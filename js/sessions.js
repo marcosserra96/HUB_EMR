@@ -55,6 +55,7 @@ const Sessions = {
         State.reviewUnlocked = false;
         Dialog.close();
         State.step = 4;
+        State.workTab = 'team';
         State.workView = 'flow';
         State.flowKind = 'asis';
         Render.header();
