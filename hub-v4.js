@@ -111,3 +111,135 @@ if(typeof Dialog!=='undefined'&&!Dialog.__hub44){
  };
 }
 })();
+
+
+/* Hub EMR Touch 5.0 — workspace design. Presentation only: the v3 domain,
+   data model, gestures, scoring, history and action commands remain untouched. */
+(()=>{'use strict';
+if(typeof Render==='undefined'||!Render.participants||Render.__hub50)return;
+Render.__hub50=true;
+const stageGroups=[['PREPARAÇÃO',0],['PRIORIZAÇÃO',2],['EXECUÇÃO',4],['RESULTADOS',5],['CONTINUIDADE',7]];
+const nav=Render.navigation.bind(Render);
+Render.navigation=function(){
+ nav();
+ const root=document.querySelector('#navigation');
+ if(!root)return;
+ for(const [label,index] of stageGroups){
+  const item=root.querySelector('[data-step="'+index+'"]');
+  if(!item)continue;
+  const heading=document.createElement('div');
+  heading.className='hub-nav-group';
+  heading.textContent=label;
+  item.before(heading);
+ }
+};
+const participantRender=Render.participants.bind(Render);
+Render.participants=function(){
+ let html=participantRender();
+ const people=State.people(), demands=State.demands(),rated=demands.filter(Classification.complete).length;
+ const cycle=State.cycle(),done=cycle?.tasks?.filter(t=>t.column==='done'&&!t.cancelled).length||0;
+ const total=cycle?.tasks?.length||0;
+ const title=State.session()?.title||'Encontro de melhoria';
+ const hero='<section class="hub-hero" aria-label="Visão do encontro">'+
+ '<div class="hub-hero-content"><div class="hub-hero-kicker"><span class="hub-live-dot"></span> WORKSPACE DE MELHORIA · ENCONTRO ATIVO</div>'+
+ '<h2>Da oportunidade à <em>transformação.</em></h2>'+
+ '<p>Um espaço para construir melhorias com o time. Identifique desafios, defina prioridades e acompanhe as entregas.</p>'+
+ '<div class="hub-hero-actions">'+
+ button('next-stage','Explorar oportunidades '+icon('arrow'),'hub-hero-main','data-step="1"')+
+ '<span class="hub-hero-session">'+icon('flag')+' '+esc(title)+'</span></div></div>'+
+ '<div class="hub-hero-art" aria-hidden="true"><div class="hub-art-ring ring-a"></div><div class="hub-art-ring ring-b"></div><div class="hub-art-core"><span>EMR</span><b>HUB</b></div><div class="hub-art-accent"></div></div>'+
+ '</section>';
+ const summary='<section class="hub-overview-strip" aria-label="Indicadores do encontro">'+
+ metric('users',people.length,'Participantes','Pessoas vinculadas')+
+ metric('flag',demands.length,'Oportunidades',rated+' avaliadas')+
+ metric('check',total?done+' / '+total:'—','Atividades','Tarefas concluídas')+
+ '</section>';
+ const anchor='<div class="grid3 v4-participant-stats" style="margin-bottom:12px">';
+ if(html.includes(anchor)){
+  html=html.replace(anchor,hero+summary+'<div class="hub-legacy-stats" hidden>'+anchor);
+  const listHead='<div class="row between v4-participant-listhead"';
+  html=html.replace(listHead,'</div>'+listHead);
+ }else{
+  html=hero+summary+html;
+ }
+ return html;
+};
+function metric(sym,value,label,sub){
+ return '<article class="hub-overview-metric"><div class="hub-metric-symbol">'+icon(sym)+'</div>'+
+ '<div class="hub-metric-copy"><strong>'+esc(value)+'</strong><span>'+esc(label)+'</span><small>'+esc(sub)+'</small></div></article>';
+}
+const originalMapping=Render.mapping.bind(Render);
+Render.mapping=function(){
+ const html=originalMapping();
+ const ds=State.demands();
+ const intro='<section class="hub-map-intro"><div class="hub-map-caption"><span class="hub-map-pulse"></span> DESCOBERTA · ETAPA 02</div>'+
+ '<div class="hub-map-intro-body"><div><h2>O que podemos melhorar?</h2><p>Transforme situações do dia a dia em oportunidades claras de melhoria. Primeiro mapeamos; depois avaliamos.</p></div>'+
+ '<div class="hub-map-metric"><b>'+ds.length+'</b><span>oportunidades registradas</span></div></div></section>';
+ const anchor='<div class="row between" style="margin-bottom:20px">';
+ return html.replace(anchor,intro+anchor);
+};
+const originalPage=Render.page.bind(Render);
+Render.page=function(){
+ originalPage();
+ const content=document.querySelector('#content');
+ if(!content)return;
+ content.classList.toggle('hub-overview',State.step===0);
+ content.classList.toggle('hub-mapping',State.step===1);
+ if(State.step===1)decorateMap();
+};
+function decorateMap(){
+ const cards=[...document.querySelectorAll('#v4MapCards .demand')];
+ const ds=State.demands();
+ if(!cards.length)return;
+ cards.forEach((el,index)=>{
+  const d=ds[index];if(!d)return;
+  el.dataset.hubStatus=Classification.complete(d)?'complete':'pending';
+  const title=el.querySelector('h2');
+  if(title&&!el.querySelector('.hub-card-number')){
+   const number=document.createElement('span');
+   number.className='hub-card-number';
+   number.textContent=String(index+1).padStart(2,'0');
+   title.before(number);
+  }
+ });
+ const header=document.querySelector('.v4-map-toolbar');
+ if(header&&!header.querySelector('.hub-map-filters')){
+  const filters=document.createElement('div');
+  filters.className='hub-map-filters';
+  filters.setAttribute('aria-label','Filtrar oportunidades');
+  filters.innerHTML='<button type="button" class="hub-filter active" data-hub-filter="all" aria-pressed="true">Todas</button>'+
+  '<button type="button" class="hub-filter" data-hub-filter="pending" aria-pressed="false">Pendentes</button>'+
+  '<button type="button" class="hub-filter" data-hub-filter="complete" aria-pressed="false">Avaliadas</button>';
+  header.appendChild(filters);
+ }
+ applyMapFilter();
+}
+let currentFilter='all';
+function applyMapFilter(){
+ const search=document.getElementById('v4MapSearch')?.value?.trim().toLocaleLowerCase('pt-BR')||'';
+ let visible=0;
+ document.querySelectorAll('#v4MapCards .demand').forEach(card=>{
+  const matchesType=currentFilter==='all'||card.dataset.hubStatus===currentFilter;
+  const matchesText=!search||card.textContent.toLocaleLowerCase('pt-BR').includes(search);
+  card.hidden=!(matchesType&&matchesText);
+  if(!card.hidden)visible++;
+ });
+ const count=document.getElementById('v4MapCount');
+ if(count)count.textContent=visible+' resultado'+(visible===1?'':'s');
+}
+document.addEventListener('click',e=>{
+ const button=e.target.closest('[data-hub-filter]');
+ if(!button)return;
+ currentFilter=button.dataset.hubFilter;
+ document.querySelectorAll('[data-hub-filter]').forEach(item=>{
+  const active=item===button;
+  item.classList.toggle('active',active);
+  item.setAttribute('aria-pressed',String(active));
+ });
+ applyMapFilter();
+});
+document.addEventListener('input',e=>{
+ if(e.target?.id==='v4MapSearch')applyMapFilter();
+});
+if(State.data){Render.header();Render.page();}
+})();
