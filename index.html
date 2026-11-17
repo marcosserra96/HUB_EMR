@@ -1,21 +1,70 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-density="compact">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#005061">
-<title>Hub EMR · Maratona de Melhoria</title>
+<meta name="application-name" content="Hub EMR">
+<meta name="description" content="Quadro colaborativo offline para maratonas de melhoria e automação da Energisa Minas Rio">
+<title>Hub EMR · Melhoria &amp; Automação</title>
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="application-name" content="Hub EMR Touch">
-<meta name="description" content="Ambiente colaborativo offline para maratonas de melhoria e automação">
-<link rel="stylesheet" href="./css/legacy-inline.css">
-<link rel="stylesheet" href="./hub-v4.css">
+<!-- Estilos: tokens primeiro; cada arquivo cuida de uma parte da interface. -->
+<link rel="stylesheet" href="./css/tokens.css">
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/shell.css">
+<link rel="stylesheet" href="./css/components.css">
+<link rel="stylesheet" href="./css/screens.css">
+<link rel="stylesheet" href="./css/workspace.css">
+<link rel="stylesheet" href="./css/keyboard.css">
+<link rel="stylesheet" href="./css/report.css">
 </head>
 <body>
+<a class="skip-link" href="#content">Ir para o conteúdo</a>
 <div class="app">
-<aside class="sidebar"><div class="brand-lockup" aria-label="Hub de Melhoria e Automação Energisa Minas Rio"><div class="brand-logo-frame"><img src="./assets/energisa-logo.svg" class="brand-logo" alt="Energisa" width="178" height="58"></div><div class="brand-copy"><span class="brand-product">Hub de Melhoria <span class="brand-amp">&amp;</span> Automação</span><span class="brand-unit">MINAS RIO <i aria-hidden="true"></i> EMR</span></div></div><nav class="nav" id="navigation" aria-label="Etapas do encontro"></nav><div class="sidefoot"><div class="offline-note">HUB DE MELHORIA &amp; AUTOMAÇÃO<br>Touch Board · versão 4.5<br>Dados locais · operação offline</div><button class="quiet" data-action="help">Como usar <span aria-hidden="true">?</span></button></div></aside>
-<div class="main"><header class="topbar"><div class="topbar-leading"><button class="icon" data-action="toggle-sidebar" id="menuToggle" aria-controls="navigation" aria-expanded="true" aria-label="Recolher menu" title="Recolher menu"></button><div class="session-info"><div class="session-title" id="sessionTitle"></div><div class="session-meta"><span class="stage-summary" id="currentStage"></span><div class="save" id="saveIndicator" role="status" aria-live="polite">Abrindo dados…</div></div></div></div><div class="top-actions"><span class="privacy-chip" title="As informações desta sessão ficam no armazenamento deste navegador"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Dados locais</span><button data-action="ui-density" id="densityBtn" aria-label="Ajustar escala da interface" title="Ajustar escala da interface"><span id="densityIcon"></span><span id="densityLabel">85%</span></button><button data-action="people" title="Participantes em qualquer etapa"><span id="peopleIcon"></span><span id="peopleCount">0</span><span class="optional-label">presentes</span></button><button data-action="undo" id="undoBtn" title="Desfazer última ação" aria-label="Desfazer última ação"></button><button data-action="sessions" title="Criar e abrir sessões"><span id="sessionsIcon"></span><span class="optional-label">Sessões</span></button><button data-action="data" title="Exportar e importar dados" aria-label="Exportar e importar dados" id="dataBtn"></button><button data-action="fullscreen" title="Tela cheia" aria-label="Tela cheia" id="fullscreenBtn"></button></div></header><main id="content" class="content" tabindex="-1"></main></div>
+  <aside class="sidebar" aria-label="Menu">
+    <div class="brand" aria-label="Hub de Melhoria e Automação, Energisa Minas Rio">
+      <img src="./assets/energisa-logo.svg" class="brand-logo" alt="Energisa" width="178" height="58">
+      <div class="brand-copy"><span class="brand-product">Hub de Melhoria &amp; Automação</span><span class="brand-unit">Minas Rio · EMR</span></div>
+    </div>
+    <nav class="nav" id="navigation" aria-label="Etapas do encontro"></nav>
+    <div class="sidefoot">
+      <button type="button" class="ghost sidefoot-help" data-action="help" data-icon="help"><span>Como usar</span></button>
+      <p class="version">Hub EMR <span data-app-version></span> · dados locais</p>
+    </div>
+  </aside>
+  <div class="scrim" data-action="toggle-sidebar" aria-hidden="true"></div>
+  <div class="main">
+    <header class="topbar">
+      <button type="button" class="icon-button" data-action="toggle-sidebar" id="menuToggle" aria-controls="navigation" aria-expanded="true" aria-label="Recolher menu"></button>
+      <div class="session-info">
+        <div class="session-title"><span id="sessionTitle"></span><span class="session-date" id="sessionDate"></span></div>
+        <div class="session-meta"><span id="currentStage"></span><span class="save" id="saveIndicator" role="status" aria-live="polite">Abrindo dados…</span><span class="net-status" id="netStatus" data-icon="offline" hidden>Offline</span></div>
+      </div>
+      <div class="top-actions">
+        <button type="button" class="secondary people-btn" data-action="people" id="peopleBtn" data-icon="people"><span id="peopleCount">0</span><span class="optional-label">presentes</span></button>
+        <button type="button" class="icon-button" data-action="undo" id="undoBtn" data-icon="undo" aria-label="Desfazer" disabled></button>
+        <details class="tools" id="toolsMenu">
+          <summary class="secondary" aria-label="Ferramentas do encontro" title="Ferramentas do encontro" data-icon="sliders"><span class="optional-label">Ferramentas</span></summary>
+          <div class="tools-panel" role="group" aria-label="Ferramentas do encontro">
+            <button type="button" class="tools-item" data-action="sessions" data-icon="folder"><span class="sel-text"><b>Sessões</b><small>Abrir ou criar encontros</small></span></button>
+            <button type="button" class="tools-item" data-action="data" data-icon="download"><span class="sel-text"><b>Backup e dados</b><small>Exportar ou importar JSON</small></span></button>
+            <div class="tools-scale">
+              <div class="tools-scale-head"><b>Escala da interface</b><span id="densityValue">85%</span></div>
+              <div class="scale-options" id="densityOptions" role="group" aria-label="Escala da interface"></div>
+            </div>
+          </div>
+        </details>
+        <button type="button" class="icon-button" data-action="fullscreen" id="fullscreenBtn" data-icon="expand" aria-label="Tela cheia" title="Tela cheia"></button>
+      </div>
+    </header>
+    <main id="content" class="content" tabindex="-1"></main>
+  </div>
 </div>
-<dialog id="modal" aria-labelledby="modalTitle"></dialog><div id="notices" aria-live="polite"></div><input type="file" id="importFile" accept="application/json,.json" hidden>
+<dialog id="modal" aria-labelledby="modalTitle"></dialog>
+<div id="notices" aria-live="polite"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+<!-- Scripts clássicos (funcionam também via file://), carregados nesta ordem e com escopo global compartilhado. -->
 <script src="./js/core.js"></script>
 <script src="./js/state.js"></script>
 <script src="./js/history.js"></script>
@@ -32,5 +81,5 @@
 <script src="./js/sessions.js"></script>
 <script src="./js/commands.js"></script>
 <script src="./js/boot.js"></script>
-<script src="./hub-v4.js" defer></script>
-</body></html>
+</body>
+</html>

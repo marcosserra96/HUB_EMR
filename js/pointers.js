@@ -107,7 +107,7 @@ const Pointers = {
             p.kind = 'person';
             p.id = person.dataset.personDrag;
             p.el = person;
-            p.ghost = this.ghost(person.textContent, e.clientX, e.clientY, false)
+            p.ghost = this.ghost(person.querySelector('b')?.textContent || person.textContent, e.clientX, e.clientY, false)
         } else if (node) {
             p.id = node.dataset.nodeId;
             p.port = target.closest('[data-port]')?.dataset.port;
@@ -181,7 +181,7 @@ const Pointers = {
     },
     ghost(text, x, y, task) {
         const g = document.createElement('div');
-        g.className = 'ghost' + (task ? ' taskghost' : '');
+        g.className = 'drag-ghost' + (task ? ' task-ghost' : '');
         g.textContent = text;
         g.style.left = x + 'px';
         g.style.top = y + 'px';

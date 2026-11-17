@@ -7,8 +7,9 @@ const Flow = {
         return State.cycle()?.flows[State.flowKind]
     },
     html() {
-        const f = this.get();
-        return `<div class="work-toolbar"><div class="segmented" aria-label="Quadro do processo">${button('flow-kind','AS IS',State.flowKind==='asis'?'chosen':'','data-kind="asis"')}${button('flow-kind','TO BE',State.flowKind==='tobe'?'chosen':'','data-kind="tobe"')}</div><div class="row">${button('flow-copy',icon('copy')+'AS IS → TO BE','','title="Copiar AS IS para TO BE"')}${button('flow-add',icon('plus')+'Novo item','primary')}${button('flow-zoom-out','−','icon','aria-label="Diminuir zoom"')}${button('flow-fit',Math.round((f.view?.z||1)*100)+'%','','aria-label="Enquadrar todo o fluxo" id="zoomLabel"')}${button('flow-zoom-in','+','icon','aria-label="Aumentar zoom"')}</div></div><div class="canvas-shell"><div class="canvas" id="flowCanvas" aria-label="Canvas do fluxo ${State.flowKind==='asis'?'AS IS':'TO BE'}"><div class="world" id="flowWorld"><svg class="flow-lines" width="5000" height="3000" id="flowLines"></svg><div id="flowNodes"></div></div>${!f.nodes.length?'<div id="flowEmpty" style="position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);pointer-events:none;text-align:center;color:#546c74"><h3>Desenhe o processo com o grupo</h3><p style="margin-top:10px">Novo item ou segure uma área vazia por 0,5 s.</p></div>':''}</div><div class="canvas-help"><span>Arraste os elementos · conecte pelos pontos azuis · toque em uma linha para editar</span><span>Fundo: arraste para deslocar · dois dedos para zoom</span></div></div>`
+        const f = this.get(),
+            kind = State.flowKind === 'asis' ? 'AS IS' : 'TO BE';
+        return `<div class="work-toolbar"><div class="segmented" role="group" aria-label="Fluxo">${button('flow-kind','<span>AS IS</span><small>como é hoje</small>',State.flowKind==='asis'?'chosen':'','data-kind="asis" aria-pressed="'+(State.flowKind==='asis')+'"')}${button('flow-kind','<span>TO BE</span><small>como será</small>',State.flowKind==='tobe'?'chosen':'','data-kind="tobe" aria-pressed="'+(State.flowKind==='tobe')+'"')}</div><div class="toolbar-group">${button('flow-copy',icon('copy')+'Copiar AS IS para TO BE','secondary','title="O TO BE começa como cópia independente do AS IS"')}<div class="zoom" role="group" aria-label="Zoom">${button('flow-zoom-out','−','icon-button','aria-label="Diminuir zoom" title="Diminuir zoom"')}${button('flow-fit',Math.round((f.view?.z||1)*100)+'%','zoom-value','aria-label="Enquadrar todo o fluxo" title="Enquadrar todo o fluxo" id="zoomLabel"')}${button('flow-zoom-in','+','icon-button','aria-label="Aumentar zoom" title="Aumentar zoom"')}</div>${button('flow-add',icon('plus')+'Novo item','primary')}</div></div><div class="canvas-shell"><div class="canvas" id="flowCanvas" aria-label="Quadro do fluxo ${kind}"><div class="world" id="flowWorld"><svg class="flow-lines" width="5000" height="3000" id="flowLines"></svg><div id="flowNodes"></div></div></div><div class="canvas-help"><span><b>Mover:</b> arraste o elemento</span><span><b>Conectar:</b> arraste a partir de um ponto azul</span><span><b>Editar:</b> toque no elemento ou na linha</span><span><b>Navegar:</b> arraste o fundo · dois dedos para zoom</span></div></div>`
     },
     resize() {
         const c = $('#flowCanvas');
@@ -25,13 +26,13 @@ const Flow = {
         this.camera()
     },
     nodeHTML(n) {
-        return `<article class="node ${esc(n.type)}" data-node-id="${n.id}" style="left:${n.x}px;top:${n.y}px" role="button" tabindex="0" aria-label="${esc(n.title)}. Arraste para mover ou toque para editar."><div class="nodebody"><small>${({step:'Etapa',start:'Início / fim',decision:'Decisão',note:'Observação'})[n.type]}</small><b>${esc(n.title)}</b></div>${['left','top','right','bottom'].map(port=>`<button class="port" data-port="${port}" aria-label="Conectar pela borda ${port}"></button>`).join('')}</article>`
+        return `<article class="node ${esc(n.type)}" data-node-id="${n.id}" style="left:${n.x}px;top:${n.y}px" role="button" tabindex="0" aria-label="${esc(n.title)}. Arraste para mover ou toque para editar."><div class="nodebody"><small>${NodeTypes[n.type]}</small><b>${esc(n.title)}</b></div>${['left','top','right','bottom'].map(port=>`<button type="button" class="port" data-port="${port}" aria-label="Conectar pela borda: ${PortNames[port].toLowerCase()}"></button>`).join('')}</article>`
     },
     renderNodes() {
         const el = $('#flowNodes');
         if (el) el.innerHTML = this.get().nodes.map(n => this.nodeHTML(n)).join('');
         $('#flowEmpty')?.remove();
-        if (!this.get().nodes.length && $('#flowCanvas')) $('#flowCanvas').insertAdjacentHTML('beforeend', '<div id="flowEmpty" style="position:absolute;left:35%;top:40%;pointer-events:none;color:#546c74">Novo item ou segure uma área vazia por 0,5 s.</div>')
+        if (!this.get().nodes.length && $('#flowCanvas')) $('#flowCanvas').insertAdjacentHTML('beforeend', `<div id="flowEmpty" class="canvas-empty"><div class="empty-icon">${icon('flow')}</div><h2>Desenhe o processo ${State.flowKind==='asis'?'como ele é hoje':'como ele deve ficar'}</h2><p>Toque em <b>Novo item</b> ou toque e segure uma área vazia do quadro por meio segundo.</p></div>`)
     },
     nodePosition(id) {
         for (const p of Pointers.active.values())
@@ -64,11 +65,11 @@ const Flow = {
     lines() {
         const svg = $('#flowLines');
         if (!svg) return;
-        svg.innerHTML = `<defs><marker id="flowArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#005061"/></marker></defs>` + this.get().edges.map(e => {
+        svg.innerHTML = `<defs><marker id="flowArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="edge-arrow"/></marker></defs>` + this.get().edges.map(e => {
             const a = this.anchor(e.from, e.fromPort),
                 b = this.anchor(e.to, e.toPort),
                 path = this.path(a, b, e.fromPort, e.toPort);
-            return `<g data-edge-id="${e.id}" role="button" tabindex="0" aria-label="Conexão ${esc(e.label||'sem rótulo')}"><path d="${path}" fill="none" stroke="#005061" stroke-width="2.5" marker-end="url(#flowArrow)"/><path class="edge-hit" d="${path}" fill="none" vector-effect="non-scaling-stroke"/>${e.label?`<text class="edge-label" x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2-10}" text-anchor="middle">${esc(e.label)}</text>`:''}</g>`
+            return `<g data-edge-id="${e.id}" role="button" tabindex="0" aria-label="Conexão ${esc(e.label||'sem rótulo')}"><path d="${path}" fill="none" class="edge-path" marker-end="url(#flowArrow)"/><path class="edge-hit" d="${path}" fill="none" vector-effect="non-scaling-stroke"/>${e.label?`<text class="edge-label" x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2-10}" text-anchor="middle">${esc(e.label)}</text>`:''}</g>`
         }).join('');
         for (const p of Pointers.active.values())
             if (p.kind === 'connect' && p.point) this.previewLine(p)
@@ -79,10 +80,7 @@ const Flow = {
         if (!el) {
             el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             el.id = 'preview-' + p.pointerId;
-            el.setAttribute('fill', 'none');
-            el.setAttribute('stroke', '#009fc2');
-            el.setAttribute('stroke-width', '3');
-            el.setAttribute('stroke-dasharray', '8 5');
+            el.setAttribute('class', 'edge-preview');
             $('#flowLines')?.appendChild(el)
         }
         el.setAttribute('d', this.path(a, p.point, p.port, 'left'))
@@ -103,9 +101,13 @@ const Flow = {
             y: (y - r.top - v.y) / v.z
         }
     },
+    /** Câmera do quadro: salva junto com os dados, mas não entra no desfazer nem na auditoria. */
     persistView() {
         const v = clone(this.viewport);
-        if (JSON.stringify(v) !== JSON.stringify(this.get().view)) History.commit('Visualização do fluxo ajustada', () => this.get().view = v, State.demand().id)
+        if (JSON.stringify(v) === JSON.stringify(this.get().view)) return;
+        this.get().view = v;
+        State.data.updatedAt = now();
+        History.persist()
     },
     zoom(factor) {
         const r = $('#flowCanvas').getBoundingClientRect(),
@@ -177,12 +179,7 @@ const Flow = {
                 }
             }
         }
-        Dialog.open(n ? 'Editar elemento' : 'Novo item no fluxo', field('title', 'Texto do elemento', n?.title, 'text', true, 'maxlength="500"') + selectField('type', 'Tipo', [
-            ['step', 'Etapa'],
-            ['start', 'Início / fim'],
-            ['decision', 'Decisão'],
-            ['note', 'Observação']
-        ], n?.type || 'step'), (n ? button('node-to-task', 'Criar atividade a partir desta etapa', '', 'type="button" data-id="' + n.id + '"') + button('node-delete', icon('trash'), 'danger icon', `type="button" data-id="${n.id}" aria-label="Excluir elemento"`) : '') + saveFooter(), () => {
+        Dialog.open(n ? 'Editar elemento' : 'Novo item no fluxo ' + (State.flowKind === 'asis' ? 'AS IS' : 'TO BE'), field('title', 'Texto do elemento', n?.title, 'text', true, 'maxlength="500"') + selectField('type', 'Tipo', Object.entries(NodeTypes), n?.type || 'step') + (n ? `<div class="dialog-extra">${button('node-to-task', icon('board') + 'Criar atividade no kanban a partir deste elemento', 'secondary', 'data-id="' + n.id + '"')}</div>` : ''), (n ? button('node-delete', icon('trash') + 'Excluir', 'danger-ghost', `data-id="${n.id}"`) : '') + saveFooter(), () => {
             const v = formValues();
             if (!v.title.trim()) return Dialog.error('Informe o texto do elemento.');
             History.commit(n ? 'Elemento do fluxo editado' : 'Elemento criado no fluxo ' + State.flowKind.toUpperCase(), () => {
@@ -241,7 +238,7 @@ const Flow = {
     edgeOpen(id) {
         const e = this.get().edges.find(x => x.id === id);
         if (!e) return;
-        Dialog.open('Editar conexão', field('label', 'Rótulo da conexão (opcional)', e.label, 'text', false, 'maxlength="150"') + selectField('from', 'Origem', this.get().nodes.map(n => [n.id, n.title]), e.from) + selectField('fromPort', 'Borda da origem', ['left', 'right', 'top', 'bottom'], e.fromPort) + selectField('to', 'Destino', this.get().nodes.map(n => [n.id, n.title]), e.to) + selectField('toPort', 'Borda do destino', ['left', 'right', 'top', 'bottom'], e.toPort), button('edge-delete', icon('trash') + 'Excluir', 'danger', `type="button" data-id="${e.id}"`) + saveFooter(), () => {
+        Dialog.open('Editar conexão', field('label', 'Rótulo da conexão (opcional)', e.label, 'text', false, 'maxlength="150"') + selectField('from', 'Origem', this.get().nodes.map(n => [n.id, n.title]), e.from) + selectField('fromPort', 'Borda da origem', Object.entries(PortNames), e.fromPort) + selectField('to', 'Destino', this.get().nodes.map(n => [n.id, n.title]), e.to) + selectField('toPort', 'Borda do destino', Object.entries(PortNames), e.toPort), button('edge-delete', icon('trash') + 'Excluir', 'danger-ghost', `data-id="${e.id}"`) + saveFooter(), () => {
             const v = formValues();
             if (v.from === v.to) return Dialog.error('Selecione elementos diferentes na origem e no destino.');
             History.commit('Conexão editada', () => Object.assign(e, v), State.demand().id);

@@ -7,7 +7,7 @@ const Dialog = {
         State.modalCleanup = null;
         const m = $('#modal');
         if (m.open) m.close();
-        m.innerHTML = `<form id="modalForm"><div class="modal-head"><h2 id="modalTitle">${title}</h2>${button('modal-close',icon('close'),'icon','aria-label="Fechar janela" type="button"')}</div><div class="modal-body">${body}<div class="modal-error" id="modalError" role="alert"></div></div>${footer?`<div class="modal-foot">${footer}</div>`:''}</form>`;
+        m.innerHTML = `<form id="modalForm"><header class="modal-head"><h2 id="modalTitle">${title}</h2>${button('modal-close',icon('close'),'icon-button','aria-label="Fechar janela" title="Fechar"')}</header><div class="modal-body">${body}<div class="modal-error" id="modalError" role="alert"></div></div>${footer?`<footer class="modal-foot">${footer}</footer>`:''}</form>`;
         State.modalSave = save;
         m.showModal();
         requestAnimationFrame(() => m.querySelector('input:not([type=checkbox]),textarea,select,button')?.focus())
@@ -23,7 +23,7 @@ const Dialog = {
         $('#modalError').textContent = s
     },
     confirm(title, text, fn, label = 'Confirmar', danger = false) {
-        this.open(title, `<p>${esc(text)}</p>`, button('modal-close', 'Voltar', '', 'type="button"') + `<button class="${danger?'danger':'primary'}" type="submit">${label}</button>`, () => {
+        this.open(title, `<p class="confirm-text">${esc(text)}</p>`, button('modal-close', 'Cancelar', 'secondary') + `<button class="${danger?'danger':'primary'}" type="submit">${label}</button>`, () => {
             fn();
             this.close()
         })
@@ -38,4 +38,4 @@ const options = (arr, value) => arr.map(x => {
 }).join('');
 const selectField = (name, label, arr, value) => `<label>${label}<select name="${name}">${options(arr,value)}</select></label>`;
 const formValues = () => Object.fromEntries(new FormData($('#modalForm')));
-const saveFooter = (text = 'Salvar') => button('modal-close', 'Cancelar', '', 'type="button"') + `<button class="primary" type="submit">${icon('check')}${text}</button>`;
+const saveFooter = (text = 'Salvar') => button('modal-close', 'Cancelar', 'secondary') + `<button class="primary" type="submit">${icon('check')}${text}</button>`;

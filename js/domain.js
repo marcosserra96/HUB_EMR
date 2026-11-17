@@ -49,17 +49,18 @@ const Ranking = {
         }
         return groups.filter(g => g.length > 1)
     },
+    /** Empate no topo do ranking (somente demandas classificadas disputam a primeira posição). */
     topTies() {
-        const a = this.sort(State.demands().filter(x => x.status !== 'Arquivada'));
+        const a = this.sort(State.demands().filter(x => x.status !== 'Arquivada' && Classification.complete(x)));
         return a.filter(d => this.equal(a[0], d))
     },
     choose(id) {
-        const list = this.sort(State.demands().filter(x => x.status !== 'Arquivada'));
+        const list = this.sort(State.demands().filter(x => x.status !== 'Arquivada' && Classification.complete(x)));
         const d = State.data.demands.find(x => x.id === id) || list[0];
         if (d?.status === 'Arquivada') return Feedback.toast('Restaure esta demanda no backlog antes de iniciar um ciclo.');
         if (!d || !Classification.complete(d)) return Feedback.toast('Conclua a classificação da demanda.');
         const incompletes = State.demands().filter(x => x.status !== 'Arquivada' && !Classification.complete(x));
-        Dialog.confirm('Confirmar demanda escolhida', `${d.title}. Será aberto um novo ciclo de trabalho; as outras demandas continuam no backlog.${incompletes.length?' Atenção: '+incompletes.length+' demanda(s) ainda sem classificação completa.':''}`, () => this.start(d), 'Confirmar e iniciar')
+        Dialog.confirm('Confirmar demanda escolhida', `“${d.title}” será trabalhada agora: um novo ciclo de trabalho é aberto com fluxos e kanban. As demais demandas continuam no backlog.${incompletes.length?' Atenção: '+plural(incompletes.length,'demanda ainda não foi classificada','demandas ainda não foram classificadas')+'.':''}`, () => this.start(d), 'Confirmar e iniciar')
     },
     start(d) {
         const existing = State.cycle();
@@ -123,7 +124,7 @@ const Ranking = {
 const Participants = {
     open(id = null) {
         const p = State.data.participants.find(x => x.id === id);
-        Dialog.open(p ? 'Editar participante' : 'Adicionar participante', field('name', 'Nome', p?.name, 'text', true, 'maxlength="150"') + areaField(p?.area) + selectField('status', 'Presença', ['Prevista', 'Presente', 'Ausente', 'Inativa'], p?.status || 'Presente'), (p ? button('person-delete', icon('trash') + 'Excluir', 'danger', `type="button" data-id="${p.id}"`) : '') + saveFooter(), () => {
+        Dialog.open(p ? 'Editar participante' : 'Adicionar participante', field('name', 'Nome', p?.name, 'text', true, 'maxlength="150"') + areaField(p?.area) + selectField('status', 'Presença', ['Prevista', 'Presente', 'Ausente', 'Inativa'], p?.status || 'Presente'), (p ? button('person-delete', icon('trash') + 'Excluir', 'danger-ghost', `data-id="${p.id}"`) : '') + saveFooter(), () => {
             const v = formValues();
             if (!v.name.trim() || !v.area.trim()) return Dialog.error('Preencha nome e área.');
             History.commit(p ? 'Participante atualizado' : 'Participante cadastrado', () => {
@@ -170,7 +171,7 @@ const Participants = {
     },
     copy() {
         const ss = State.data.sessions.filter(s => s.id !== State.session().id && s.participantIds.length);
-        Dialog.open('Copiar participantes de outra sessão', ss.length ? `<div class="selection-list">${ss.map(s=>button('copy-people-session',`<span>${esc(s.title)}<small> · ${fmt(s.date)} · ${s.participantIds.length} pessoas</small></span>`,'',`type="button" data-id="${s.id}"`)).join('')}</div>` : '<p>Nenhuma sessão anterior tem participantes cadastrados.</p>', button('modal-close', 'Fechar', '', 'type="button"'))
+        Dialog.open('Copiar participantes de outra sessão', ss.length ? `<p class="muted">As pessoas entram como previstas. Quem já está no grupo não é duplicado.</p><div class="selection-list">${ss.map(s=>button('copy-people-session',`<span class="sel-text"><b>${esc(s.title)}</b><small>${fmt(s.date)} · ${plural(s.participantIds.length,'pessoa')}</small></span>${icon('arrow')}`,'sel-item',`data-id="${s.id}"`)).join('')}</div>` : '<p class="muted">Nenhuma outra sessão tem participantes cadastrados.</p>', button('modal-close', 'Fechar', 'secondary'))
     },
     copyFrom(id) {
         const s = State.data.sessions.find(x => x.id === id);
@@ -196,7 +197,7 @@ const Participants = {
         Feedback.toast(count + ' participantes copiados como previstos.', true)
     },
     drawer() {
-        Dialog.open('Participantes · ' + State.people().filter(x => x.status === 'Presente').length + ' presentes', `<div class="selection-list">${State.people().map(p=>button('person-edit',`<span><b>${esc(p.name)}</b><small> · ${esc(p.area)} · ${esc(p.status)}</small></span>${icon('edit')}`,'',`type="button" data-id="${p.id}"`)).join('')||'<p>Nenhuma pessoa cadastrada.</p>'}</div>`, button('person-add', icon('plus') + 'Adicionar', 'primary', 'type="button"') + button('people-stage', 'Abrir etapa', '', 'type="button"'))
+        Dialog.open('Participantes', `<p class="muted">${plural(State.people().filter(x => x.status === 'Presente').length,'pessoa presente','pessoas presentes')} de ${State.people().length}.</p><div class="selection-list">${State.people().map(p=>button('person-edit',`<span class="avatar small" aria-hidden="true">${esc(Utils.initials(p.name))}</span><span class="sel-text"><b>${esc(p.name)}</b><small>${esc(p.area)}</small></span>${badge(esc(p.status),presenceTone(p.status))}`,'sel-item',`data-id="${p.id}"`)).join('')||'<p class="muted">Nenhuma pessoa cadastrada.</p>'}</div>`, button('people-stage', 'Abrir etapa Participantes', 'secondary') + button('person-add', icon('plus') + 'Adicionar participante', 'primary'))
     }
 };
 const Demands = {
@@ -211,11 +212,11 @@ const Demands = {
     },
     open(id = null) {
         const d = State.data.demands.find(x => x.id === id);
-        Dialog.open(d ? 'Editar demanda' : 'Registrar problema', `<div class="hint">Mapeie o problema. A solução e as atividades serão trabalhadas depois.</div>` + areaField(d?.area) + field('title', 'Título', d?.title, 'text', true, 'maxlength="250"') + textarea('description', 'Descrição do problema', d?.description || ''), saveFooter('Salvar demanda'), () => {
+        Dialog.open(d ? 'Editar demanda' : 'Registrar demanda', areaField(d?.area) + field('title', 'Título', d?.title, 'text', true, 'maxlength="250" placeholder="Ex.: Conferência manual de leituras"') + textarea('description', 'Descrição do problema', d?.description || ''), saveFooter('Salvar demanda'), () => {
             const v = formValues();
             if (!v.title.trim() || !v.area.trim()) return Dialog.error('Preencha área e título.');
             let targetId = d?.id || uid();
-            History.commit(d ? 'Demanda editada' : 'Problema mapeado', () => {
+            History.commit(d ? 'Demanda editada' : 'Demanda registrada', () => {
                 if (d) Object.assign(d, {
                     area: v.area.trim(),
                     title: v.title.trim(),

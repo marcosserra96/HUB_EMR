@@ -193,7 +193,7 @@ const Transfer = {
         }
         try {
             const raw = this.validate(JSON.parse(await file.text()));
-            Dialog.open('Importação validada', `<div class="hint">${raw.sessions.length} sessões · ${raw.demands.length} demandas · ${raw.participants.length} participantes · ${raw.cycles.length} ciclos</div><p>Adicionar mantém os dados atuais e cria cópias com novos identificadores. Substituir troca toda a base local; você poderá desfazer a substituição.</p>`, button('modal-close', 'Cancelar', '', 'type="button"') + button('import-merge', 'Adicionar sessões', 'primary', 'type="button"') + button('import-replace', 'Substituir base', 'danger', 'type="button"'));
+            Dialog.open('Backup validado', `${notice(`O arquivo contém ${plural(raw.sessions.length,'sessão','sessões')}, ${plural(raw.demands.length,'demanda')}, ${plural(raw.participants.length,'participante')} e ${plural(raw.cycles.length,'ciclo')}.`,'success')}<p><b>Adicionar</b> mantém os dados atuais e inclui as sessões do arquivo como cópias.</p><p><b>Substituir</b> troca toda a base deste navegador pelo arquivo. É possível desfazer logo em seguida.</p>`, button('import-replace', 'Substituir base', 'danger-ghost') + button('modal-close', 'Cancelar', 'secondary') + button('import-merge', 'Adicionar sessões', 'primary'));
             this.prepared = raw
         } catch (e) {
             Feedback.toast('Importação recusada: ' + e.message)

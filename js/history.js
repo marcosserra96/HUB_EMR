@@ -5,13 +5,14 @@ const Feedback = (() => {
     return {
         toast(message, undo = false) {
             clearTimeout(timer);
-            $('#notices').innerHTML = `<div class="toast" role="status"><span>${esc(message)}</span>${undo?button('undo','Desfazer'):button('dismiss',icon('close'),'icon','aria-label="Fechar aviso"')}</div>`;
+            $('#notices').innerHTML = `<div class="toast" role="status"><span>${esc(message)}</span>${undo?button('undo',icon('undo')+'Desfazer','toast-action'):button('dismiss',icon('close'),'icon-button toast-close','aria-label="Fechar aviso" title="Fechar"')}</div>`;
             timer = setTimeout(() => $('#notices').replaceChildren(), undo ? 9000 : 5000)
         },
         save(status, error = false) {
             const el = $('#saveIndicator');
             el.textContent = status;
-            el.classList.toggle('error', error)
+            el.classList.toggle('error', error);
+            el.classList.toggle('busy', /Salvando/.test(status))
         }
     }
 })();
@@ -63,7 +64,7 @@ const History = {
             State.savedRevision = Math.max(State.savedRevision, revision);
             if (State.savedRevision === State.revision) {
                 State.dirty = false;
-                Feedback.save('Salvo · neste navegador')
+                Feedback.save('Salvo neste navegador')
             }
         }).catch(e => {
             Feedback.save('Falha ao salvar · exporte um backup', true);

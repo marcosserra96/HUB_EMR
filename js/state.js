@@ -50,6 +50,8 @@ const State = {
     modalSave: null,
     modalCleanup: null,
     filter: '',
+    mapFilter: 'all',
+    mapSearch: '',
     statusFilter: '',
     expanded: new Set(),
     session() {

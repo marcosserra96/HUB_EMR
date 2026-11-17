@@ -1,0 +1,40 @@
+/* Hub EMR · Teclado virtual da TV de toque (js/keyboard.js).
+   Tamanhos em px e variáveis --kbd-* porque o próprio teclado é redimensionável pelo usuário. */
+.touch-keyboard {
+  position: fixed; z-index: var(--z-keyboard);
+  width: 420px; max-width: calc(100vw - 16px); padding: 6px;
+  background: var(--color-bg-subtle); border: 1px solid var(--color-border-strong); border-radius: 15px;
+  box-shadow: var(--shadow-overlay); color: var(--color-text);
+  user-select: none; touch-action: none; container-type: inline-size;
+  font-size: 15px;
+}
+.touch-keyboard button { min-height: 0; min-width: 0; }
+.touch-keyboard button:active:not(:disabled) { transform: none; background: var(--color-primary-subtle); }
+.kbd-top { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+.kbd-handle { flex: 1; height: var(--kbd-key-h, 40px); min-width: 0; justify-content: flex-start; padding: 3px 6px; border: 0; background: transparent; text-align: left; cursor: move; touch-action: none; font-size: 12px; color: var(--color-primary); }
+.kbd-handle:hover { background: transparent; }
+.kbd-handle small { display: block; max-width: 280px; margin-top: 1px; font-size: 10px; font-weight: 400; color: var(--color-text-muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.kbd-keys { display: flex; flex-direction: column; gap: 4px; overflow: auto; }
+.kbd-row { display: flex; justify-content: center; gap: 4px; }
+.kbd-row:nth-child(3) { padding: 0 16px; }
+.kbd-key { flex: 1; min-width: 0; height: var(--kbd-key-h, 40px); padding: 3px; border-radius: 8px; border-color: var(--color-border); background: #fff; color: var(--color-text); font-size: var(--kbd-font, 15px); font-weight: 600; touch-action: none; }
+.kbd-function { background: var(--color-bg-inset); color: var(--color-primary); font-size: calc(var(--kbd-font, 15px) - 2px); }
+.kbd-top > .kbd-key { flex: 0 0 var(--kbd-key-h, 40px); padding: 3px; }
+.kbd-key.kbd-space { flex: 4; font-size: calc(var(--kbd-font, 15px) - 3px); }
+.kbd-enter { flex: 1.4; background: var(--color-primary); border-color: var(--color-primary); color: #fff; font-size: calc(var(--kbd-font, 15px) - 2px); }
+.kbd-number-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.touch-keyboard.numeric { width: 236px; }
+.kbd-number-grid .kbd-key { min-width: 0; font-size: var(--kbd-font, 15px); }
+.kbd-number-grid .kbd-function { font-size: calc(var(--kbd-font, 15px) - 3px); }
+.touch-keyboard.numeric .kbd-handle small { max-width: 120px; }
+.kbd-resize-corner { position: absolute; z-index: 5; width: 28px; height: 28px; touch-action: none; }
+.kbd-resize-corner::before, .kbd-resize-corner::after { content: ""; position: absolute; left: 4px; top: 4px; background: var(--color-brand); border-radius: 2px; opacity: .8; }
+.kbd-resize-corner::before { width: 15px; height: 2px; }
+.kbd-resize-corner::after { width: 2px; height: 15px; }
+.kbd-resize-corner[data-corner="tl"] { left: -3px; top: -3px; }
+.kbd-resize-corner[data-corner="tr"] { right: -3px; top: -3px; transform: rotate(90deg); }
+.kbd-resize-corner[data-corner="br"] { right: -3px; bottom: -3px; transform: rotate(180deg); }
+.kbd-resize-corner[data-corner="bl"] { left: -3px; bottom: -3px; transform: rotate(270deg); }
+/* Janela aberta com o teclado: sobe para deixar espaço. */
+dialog.kbd-room { max-height: calc(100vh - var(--keyboard-height, 250px) - 28px); margin-top: 12px; margin-bottom: auto; }
+body.keyboard-visible:not(.keyboard-modal) { padding-bottom: calc(var(--keyboard-height, 250px) + 16px); }

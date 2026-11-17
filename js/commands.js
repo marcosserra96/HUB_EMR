@@ -10,7 +10,16 @@ const Commands = {
         Dialog.close()
     },
     'toggle-sidebar': () => Layout.toggle(),
-    'ui-density': () => Layout.cycleDensity(),
+    'ui-density': b => Layout.setDensity(b.dataset.density),
+    'map-filter': b => {
+        State.mapFilter = b.dataset.filter;
+        $$('[data-action="map-filter"]').forEach(x => {
+            const on = x === b;
+            x.classList.toggle('chosen', on);
+            x.setAttribute('aria-pressed', String(on))
+        });
+        Render.mappingResults()
+    },
     'work-details': () => Layout.workDetails(),
     'navigate': b => Navigation.go(Number(b.dataset.step)),
     'next-stage': b => Navigation.go(Number(b.dataset.step)),
@@ -190,6 +199,10 @@ $('#modal').addEventListener('cancel', () => {
 });
 $('#importFile').addEventListener('change', e => Transfer.read(e.target.files[0]));
 document.addEventListener('input', e => {
+    if (e.target.id === 'mapSearch') {
+        State.mapSearch = e.target.value;
+        Render.mappingResults()
+    }
     if (e.target.id === 'backlogSearch') {
         State.filter = e.target.value;
         Render.backlogResults()

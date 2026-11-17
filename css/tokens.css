@@ -1,0 +1,109 @@
+/* ═══════════════════════════════════════════════════════════════
+   Hub EMR · Tokens do design system
+   Fonte da verdade de cores, tipografia, espaços, raios e sombras.
+   Componentes usam só estas variáveis: nunca escreva hexadecimais fora deste arquivo
+   (exceção documentada: o SVG do fluxo no relatório impresso, em js/review.js).
+   Todos os pares texto/fundo passam 4,5:1 (WCAG AA).
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* Marca Energisa */
+  --color-primary: #005061;          /* ações principais, item ativo, títulos de destaque */
+  --color-primary-hover: #003d4a;
+  --color-primary-subtle: #e2eff2;
+  --color-brand: #009bc1;            /* azul da marca: foco, linhas, progresso (não usar para texto) */
+  --color-link: #007591;
+  --color-accent: #b54c12;           /* laranja Energisa ajustado para AA; recomendação, decisão */
+  --color-accent-hover: #963d0c;
+  --color-accent-brand: #f37021;     /* laranja puro: só detalhes gráficos, nunca texto */
+  --color-accent-subtle: #fdeee4;
+  --color-on-accent-subtle: #a3440f;
+
+  /* Status */
+  --color-success: #15703d;
+  --color-success-subtle: #e3f3e9;
+  --color-warning: #9a4a07;
+  --color-on-warning-subtle: #8f4406;
+  --color-warning-subtle: #fdf1dc;
+  --color-danger: #b42335;
+  --color-danger-hover: #931b2b;
+  --color-on-danger-subtle: #a61f30;
+  --color-danger-subtle: #fbe9eb;
+  --color-info: #0b5a83;
+  --color-info-subtle: #e2f1f8;
+
+  /* Texto */
+  --color-text: #12343d;             /* títulos e texto principal */
+  --color-text-secondary: #40575f;   /* parágrafos e descrições */
+  --color-text-muted: #56696f;       /* metadados e rótulos pequenos (mínimo AA) */
+  --color-on-primary: #ffffff;
+
+  /* Superfícies e bordas */
+  --color-bg: #f2f6f7;
+  --color-bg-card: #ffffff;
+  --color-bg-subtle: #f7fafb;
+  --color-bg-inset: #e9f0f2;
+  --color-border: #d8e3e6;
+  --color-border-subtle: #e8eff1;
+  --color-border-strong: #b6c8cd;
+  --color-scrim: rgb(7 32 39 / .46);
+
+  /* Fluxo (quadro) */
+  --color-node-start: #e5f5f3;
+  --color-node-decision: #fff1e5;
+  --color-node-note: #fff8dc;
+  --color-node-note-border: #d9a93a;
+  --color-column-validation: #c9a227; /* marcador gráfico, não texto */
+
+  /* Tipografia: escala em rem, que acompanha a escala da interface. */
+  --font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
+  --text-xs: .75rem;     /* 12 */
+  --text-sm: .875rem;    /* 14 */
+  --text-base: 1rem;     /* 16 */
+  --text-md: 1.125rem;   /* 18 */
+  --text-lg: 1.25rem;    /* 20 */
+  --text-xl: 1.5rem;     /* 24 */
+  --text-2xl: 1.875rem;  /* 30 */
+  --text-3xl: 2.5rem;    /* 40 */
+  --leading: 1.5;
+  --weight-medium: 550;
+  --weight-semibold: 650;
+  --weight-bold: 720;
+
+  /* Espaço (múltiplos de 4px) */
+  --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem;
+  --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
+
+  /* Raios */
+  --radius-sm: .375rem;
+  --radius: .625rem;      /* botões e campos */
+  --radius-lg: .875rem;   /* cards */
+  --radius-xl: 1.25rem;   /* janelas */
+
+  /* Sombras */
+  --shadow-card: 0 1px 2px rgb(0 60 75 / .06), 0 1px 1px rgb(0 60 75 / .03);
+  --shadow-raised: 0 6px 18px rgb(0 60 75 / .10);
+  --shadow-overlay: 0 18px 50px rgb(0 40 50 / .22);
+
+  /* Toque: alvo mínimo. Na TV, 3,5rem ≈ 48px na escala padrão (85%). */
+  --touch: 3.5rem;
+  --touch-sm: 2.75rem;
+
+  /* Movimento */
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --dur: .18s;
+
+  /* Camadas */
+  --z-sticky: 20; --z-menu: 60; --z-drawer: 80; --z-toast: 7000; --z-drag: 8000; --z-keyboard: 9000;
+
+  /* Medidas da moldura */
+  --sidebar-w: 16rem;
+  --sidebar-rail: 4.75rem;
+  --topbar-h: 4.5rem;
+}
+
+/* Escala da interface (Ferramentas → Escala). Tudo em rem acompanha; o quadro de fluxo tem zoom próprio. */
+html { font-size: 16px; }
+html[data-density="compact"] { font-size: 13.6px; }
+html[data-density="dense"] { font-size: 12px; }
+html[data-density="mini"] { font-size: 10.4px; }
+html[data-density="micro"] { font-size: 8.8px; }
