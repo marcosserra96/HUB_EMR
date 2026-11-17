@@ -47,6 +47,7 @@
   --color-border-subtle: #e8eff1;
   --color-border-strong: #b6c8cd;
   --color-scrim: rgb(7 32 39 / .46);
+  --color-scrim-strong: rgb(7 32 39 / .62);   /* fundo da apresentação de demanda */
 
   /* Fluxo (quadro) */
   --color-node-start: #e5f5f3;

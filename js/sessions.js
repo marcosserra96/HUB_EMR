@@ -89,7 +89,7 @@ function dataMenu() {
 function help() {
     const steps = [
         ['Prepare', 'Crie a sessão e cadastre os participantes. O botão de pessoas no topo mantém a lista acessível em todas as etapas.'],
-        ['Mapeie', 'Registre área, título e descrição de cada problema. A avaliação vem depois, para não misturar diagnóstico e solução.'],
+        ['Mapeie', 'Registre área, título e descrição de cada problema. Toque num card para apresentá-lo em tela grande enquanto quem trouxe a demanda explica; use Próxima ou deslize o dedo para seguir a rodada. A avaliação vem depois, para não misturar diagnóstico e solução.'],
         ['Classifique', 'Dê notas de 0 a 5 nos seis critérios. Zero vale como resposta; sem nota, o critério fica pendente.'],
         ['Decida', 'Confirme a primeira demanda do ranking. Empate em pontuação, Impacto e Viabilidade pede decisão do grupo.'],
         ['Desenhe o processo', 'No fluxo, toque em Novo item ou segure o fundo por meio segundo. Arraste os elementos e conecte pelos pontos azuis. Toque numa linha para editá-la. Arraste o fundo para navegar e use dois dedos para zoom; o botão de porcentagem enquadra o fluxo.'],

@@ -84,6 +84,7 @@ Antes de criar um elemento, procure aqui. Não duplique.
 | `actionMenu(rótulo, itens)` | `core.js` | Menu "⋯" com as ações secundárias de um item. Excluir fica em vermelho, depois de um separador |
 | `.card`, `.grid-cards`, `.stack-list` | `components.css` | Cartões e listas |
 | `.segmented` | `components.css` | Filtro curto (2 a 4 opções) com `aria-pressed` |
+| Apresentação (`Presenter`) | `present.js`, `screens.css` | Card do mapeamento em tela grande, com giro de ida e volta. Movimento de 680 ms, só `transform` e `opacity`; com movimento reduzido vira um esmaecer |
 | Abas de equipe (`Render.teamBar`) | `teams.css` | Só no modo equipes, fixas abaixo da barra do topo: visão geral, uma aba por equipe e montagem |
 | `.toolbar` + `.search` | `components.css` | Busca e filtros acima de uma lista |
 | `Dialog.open` / `Dialog.confirm` | `dialog.js` | Janelas. Rodapé: secundário, depois principal; excluir à esquerda. Conteúdo largo: envolva em `.dialog-wide` |

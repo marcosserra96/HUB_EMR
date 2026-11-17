@@ -342,33 +342,41 @@ const Demands = {
             Feedback.toast(n.length ? 'Salva. Possível duplicidade com: ' + n[0].title : 'Demanda salva.', true)
         })
     },
+    /** Exclusão definitiva só para demandas que nunca tiveram ciclo de trabalho (as outras são arquivadas). */
+    canDelete(id) {
+        return !State.data.cycles.some(c => c.demandId === id)
+    },
     remove(id) {
         const d = State.data.demands.find(x => x.id === id);
         if (!d) return Feedback.toast('Demanda não encontrada.');
-        const linked = State.data.cycles.some(c => c.demandId === id);
-        if (linked) return this.archive(id);
-        Dialog.confirm('Excluir demanda?', d.title + ' será excluída do encontro. Esta ação pode ser desfeita.', () => {
-            History.commit('Demanda excluída', () => {
-                State.data.demands = State.data.demands.filter(x => x.id !== id);
-                State.data.sessions.forEach(session => session.demandIds = session.demandIds.filter(demandId => demandId !== id));
-            });
-            Render.header();
-            Render.page();
-            Feedback.toast('Demanda excluída.', true);
-        }, 'Excluir', true);
+        if (!this.canDelete(id)) return this.archive(id);
+        Dialog.confirm('Excluir demanda?', `“${d.title}” será excluída do encontro. Esta ação pode ser desfeita logo em seguida.`, () => this.purge(id), 'Excluir', true);
+    },
+    purge(id) {
+        if (!this.canDelete(id)) return;
+        History.commit('Demanda excluída', () => {
+            State.data.demands = State.data.demands.filter(x => x.id !== id);
+            State.data.sessions.forEach(session => session.demandIds = session.demandIds.filter(demandId => demandId !== id));
+        });
+        Dialog.close();
+        Render.header();
+        Render.page();
+        Feedback.toast('Demanda excluída.', true);
     },
     archive(id) {
         const d = State.data.demands.find(x => x.id === id);
         if (!d) return Feedback.toast('Demanda não encontrada.');
         if (d.status === 'Arquivada') return Feedback.toast('Esta demanda já está arquivada.');
-        Dialog.confirm('Arquivar demanda?', d.title + ' sairá do mapeamento ativo, mas continuará no backlog com seu histórico.', () => {
+        const deletable = this.canDelete(id);
+        Dialog.open('Arquivar ou excluir?', `<p class="confirm-text"><b>Arquivar</b> tira “${esc(d.title)}” do mapeamento ativo, mas ela continua no backlog com o histórico.</p><p class="confirm-text">${deletable ? '<b>Excluir</b> apaga a demanda do encontro. Use para testes ou registros duplicados.' : 'Esta demanda já teve um ciclo de trabalho, por isso só pode ser arquivada.'}</p>`, (deletable ? button('demand-purge', icon('trash') + 'Excluir', 'danger-ghost', `data-id="${id}"`) : '') + button('modal-close', 'Cancelar', 'secondary') + `<button class="primary" type="submit">${icon('archive')}Arquivar</button>`, () => {
             History.commit('Demanda arquivada', () => {
                 d.status = 'Arquivada';
             }, id);
+            Dialog.close();
             Render.header();
             Render.page();
             Feedback.toast('Demanda arquivada. Você pode restaurá-la no backlog.', true);
-        }, 'Arquivar');
+        });
     },
     restore(id) {
         const d = State.data.demands.find(x => x.id === id);

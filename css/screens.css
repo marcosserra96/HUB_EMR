@@ -28,6 +28,40 @@
 .demand-card.archived { background: var(--color-bg-subtle); }
 .demand-card.archived h3 { color: var(--color-text-secondary); }
 
+/* Card do mapeamento inteiro tocável (abre a apresentação); os botões do rodapé ficam por cima. */
+.demand-card.presentable { position: relative; transition: box-shadow var(--dur), transform var(--dur) var(--ease-out), border-color var(--dur); }
+.demand-card.presentable:hover { box-shadow: var(--shadow-raised); border-color: var(--color-border-strong); }
+.card-open { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; min-height: 0; padding: 0; border: 0; border-radius: inherit; background: transparent; cursor: zoom-in; }
+.card-open:hover { background: transparent; border: 0; }
+.card-open:active:not(:disabled) { transform: none; }
+.demand-card.presentable:has(.card-open:active) { transform: scale(.985); }
+.demand-card.presentable .card-foot, .demand-card.presentable .notice { position: relative; z-index: 1; }
+.demand-card.presented { visibility: hidden; }
+
+/* ── Apresentação da demanda (js/present.js) ── */
+body.presenting { overflow: hidden; }
+.present-layer { position: fixed; inset: 0; z-index: calc(var(--z-toast) - 1); display: grid; place-items: center; }
+.present-scrim { position: absolute; inset: 0; background: var(--color-scrim-strong); backdrop-filter: blur(3px); }
+.present-move { position: relative; width: min(70rem, 92vw); height: min(84vh, 50rem); perspective: 2200px; transform-origin: center; }
+.present-flip { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateY(180deg); }
+.present-face { position: absolute; inset: 0; border-radius: var(--radius-xl); background: var(--color-bg-card); box-shadow: var(--shadow-overlay); backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
+.present-front { --k: 1; display: flex; flex-direction: column; gap: calc(var(--space-3) * var(--k)); padding: calc(var(--space-5) * var(--k)); border: 1px solid var(--color-border); }
+.present-front-num { font-size: calc(var(--text-sm) * var(--k)); font-weight: var(--weight-bold); color: var(--color-text-muted); }
+.present-front b { font-size: calc(var(--text-md) * var(--k)); line-height: 1.25; }
+.present-front-desc { font-size: calc(var(--text-base) * var(--k)); color: var(--color-text-secondary); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.present-back { transform: rotateY(180deg); display: flex; flex-direction: column; touch-action: pan-y; }
+.present-head { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2) var(--space-3); padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8); border-bottom: 1px solid var(--color-border-subtle); }
+.present-count { font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--color-link); font-variant-numeric: tabular-nums; }
+.present-date { font-size: var(--text-sm); color: var(--color-text-muted); }
+.present-x { margin-left: auto; }
+.present-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-8) var(--space-10) var(--space-10); scrollbar-width: thin; }
+.present-num { font-size: var(--text-lg); font-weight: var(--weight-bold); color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+.present-body h2 { margin-top: var(--space-1); font-size: var(--text-3xl); letter-spacing: -.02em; line-height: 1.15; max-width: 32ch; }
+.present-desc { margin-top: var(--space-6); max-width: 68ch; font-size: var(--text-xl); line-height: 1.6; color: var(--color-text); white-space: pre-wrap; overflow-wrap: anywhere; }
+.present-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-4) var(--space-8); border-top: 1px solid var(--color-border-subtle); background: var(--color-bg-subtle); }
+.present-foot button { min-width: 10rem; }
+.present-foot .ghost { min-width: 0; }
+
 /* ── 3 · Classificação ── */
 .classify { display: grid; grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr); gap: var(--space-5); align-items: start; }
 .demand-list { position: sticky; top: calc(var(--topbar-h) + var(--space-4)); max-height: calc(100dvh - var(--topbar-h) - var(--space-8)); overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2); background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); scrollbar-width: thin; }
@@ -45,7 +79,7 @@
 .classify-card { padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-5); }
 .classify-head { display: flex; justify-content: space-between; gap: var(--space-6); align-items: flex-start; }
 .classify-head h2 { margin-top: var(--space-2); font-size: var(--text-xl); }
-.classify-head .desc { margin-top: var(--space-2); color: var(--color-text-secondary); white-space: pre-wrap; max-width: 80ch; }
+.classify-desc { margin-top: calc(-1 * var(--space-2)); color: var(--color-text-secondary); white-space: pre-wrap; overflow-wrap: anywhere; }
 .score-box { flex-shrink: 0; display: flex; align-items: baseline; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); background: var(--color-primary-subtle); color: var(--color-primary); }
 .score-box b { font-size: var(--text-3xl); font-weight: var(--weight-bold); line-height: 1; font-variant-numeric: tabular-nums; }
 .score-box span { font-size: var(--text-sm); font-weight: var(--weight-semibold); line-height: 1.2; }
@@ -120,6 +154,14 @@
 @media (max-width: 760px) {
   .classify-card { padding: var(--space-4); }
   .classify-head { flex-direction: column; gap: var(--space-3); }
+  .present-move { width: 100vw; height: 100dvh; }
+  .present-face { border-radius: 0; }
+  .present-head { padding-left: var(--space-4); }
+  .present-body { padding: var(--space-5) var(--space-4); }
+  .present-body h2 { font-size: var(--text-2xl); }
+  .present-desc { font-size: var(--text-md); }
+  .present-foot { padding: var(--space-3) var(--space-4); }
+  .present-foot button { min-width: 0; flex: 1; }
   .rank-card, .rank-card.recommended { grid-template-columns: auto minmax(0, 1fr) auto; padding: var(--space-4); }
   .rank-position { grid-row: 1; grid-column: 1; width: 2.75rem; height: 2.75rem; }
   .rank-score { grid-row: 1; grid-column: 3; min-width: 0; }

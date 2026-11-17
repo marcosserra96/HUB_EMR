@@ -196,3 +196,56 @@ test.describe('celular', () => {
     await expect(page.locator('body')).not.toHaveClass(/nav-open/);
   });
 });
+
+test('arquivar oferece excluir de vez quando a demanda nunca teve ciclo', async ({ page }) => {
+  await openApp(page);
+  await seedMeeting(page);
+  await goStep(page, 1);
+  const menu = page.locator('.demand-card', { hasText: 'Ordens impressas' }).locator('details.menu');
+  await menu.locator('summary').click();
+  await menu.locator('[data-action="demand-archive"]').click();
+  await page.locator('#modal [data-action="demand-purge"]').click();
+  await expect(page.locator('.demand-card')).toHaveCount(2);
+  expect((await data(page)).demands.map(d => d.title)).not.toContain('Ordens impressas');
+  await action(page, 'undo').first().click();
+  expect((await data(page)).demands.map(d => d.title)).toContain('Ordens impressas');
+});
+
+test('demanda com ciclo só pode ser arquivada', async ({ page }) => {
+  await openApp(page);
+  await seedMeeting(page, { cycle: true });
+  await page.evaluate(() => Demands.archive(State.data.demands[0].id));
+  await expect(page.locator('#modal')).toContainText('só pode ser arquivada');
+  await expect(page.locator('#modal [data-action="demand-purge"]')).toHaveCount(0);
+});
+
+test('tocar no card apresenta a demanda inteira, navega e volta ao lugar', async ({ page }) => {
+  await openApp(page);
+  await seedMeeting(page);
+  await page.evaluate(() => { const d = State.data.demands[0]; d.description = 'Linha um.\n\nTexto longo que no card fica cortado. '.repeat(8); Storage.save(State.data); });
+  await goStep(page, 1);
+  await page.locator('.demand-card').first().locator('.card-open').click();
+  const layer = page.locator('.present-layer');
+  await expect(layer).toBeVisible();
+  await expect(layer.locator('#presentTitle')).toHaveText('Leituras atípicas');
+  await expect(layer.locator('.present-desc')).toContainText('Texto longo que no card fica cortado');
+  await expect(page.locator('.demand-card.presented')).toHaveCount(1);
+  await page.keyboard.press('ArrowRight');
+  await expect(layer.locator('#presentTitle')).toHaveText('Ordens impressas');
+  await expect(layer.locator('.present-count')).toHaveText('2 de 3');
+  await layer.locator('[data-action="present-prev"]').click();
+  await expect(layer.locator('#presentTitle')).toHaveText('Leituras atípicas');
+  await page.mouse.click(20, 1060);
+  await expect(layer).toHaveCount(0);
+  await expect(page.locator('.demand-card.presented')).toHaveCount(0);
+  await expect(page.locator('.demand-card').first()).toBeVisible();
+});
+
+test('na classificação a descrição ocupa a largura do painel', async ({ page }) => {
+  await openApp(page);
+  await seedMeeting(page);
+  await goStep(page, 2);
+  const panel = await page.locator('.classify-card').boundingBox();
+  const desc = await page.locator('.classify-desc').boundingBox();
+  expect(desc.width).toBeGreaterThan(panel.width * 0.85);
+});

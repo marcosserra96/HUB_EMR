@@ -26,6 +26,7 @@ js/               scripts clássicos, carregados nesta ordem pelo index.html:
   domain.js       regras: classificação, ranking/desempate, equipes (Teams), participantes, demandas
   layout.js       navegação entre etapas, menu lateral, escala, menus suspensos
   render.js       HTML de cada etapa
+  present.js      apresentação de uma demanda em tela grande (mapeamento), com o card virando
   flow.js         quadro AS IS / TO BE
   kanban.js       kanban e responsáveis
   pointers.js     multitoque, arrastar e soltar, travas por item, gestos (✓, X, setas)
