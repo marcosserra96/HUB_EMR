@@ -875,3 +875,12 @@ button.primary:hover{background:#007e9d}
  .hub-mapping .hub-map-intro p{font-size:10px!important}
  .hub-mapping .hub-filter{padding:8px!important;font-size:11px}
 }
+
+/* Hub EMR Touch 5.4 — keep the Tools dropdown above the page content */
+.main{position:relative;isolation:isolate;overflow:visible}
+.main>.topbar{position:relative;z-index:100;overflow:visible}
+.main>#content{position:relative;z-index:1}
+.top-actions{position:relative;overflow:visible}
+.v4-tools{position:relative;z-index:110}
+.v4-tools[open]{z-index:120}
+.v4-tools-panel{z-index:121;overflow:visible}
