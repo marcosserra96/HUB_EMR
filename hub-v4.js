@@ -189,7 +189,7 @@ Render.page=function(){
 };
 function decorateMap(){
  const cards=[...document.querySelectorAll('#v4MapCards .demand')];
- const ds=State.demands();
+ const ds=State.demands().filter(d=>d.status!=='Arquivada');
  if(!cards.length)return;
  cards.forEach((el,index)=>{
   const d=ds[index];if(!d)return;
