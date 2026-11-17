@@ -718,3 +718,160 @@ button.primary:hover{background:#007e9d}
  .hub-overview-metric{border:1px solid #e5ecf1!important}
 }
 @media print{.sidebar{background:#fff!important}}
+
+
+/* Hub EMR Touch 5.3 — compact discovery strip and properly aligned filters */
+.hub-mapping .hub-map-intro{
+ display:flex!important;
+ flex-direction:column!important;
+ justify-content:center;
+ gap:5px;
+ min-height:76px!important;
+ padding:11px 17px!important;
+ margin:0 0 10px!important;
+ border:1px solid #e4ecf0;
+ border-radius:11px;
+ background:#fff!important;
+ box-shadow:none!important;
+}
+.hub-mapping .hub-map-caption{
+ margin:0!important;
+ font-size:9px;
+ line-height:1.4;
+ letter-spacing:1px;
+}
+.hub-mapping .hub-map-pulse{width:6px;height:6px;box-shadow:none}
+.hub-mapping .hub-map-intro-body{
+ display:flex!important;
+ flex-direction:row!important;
+ align-items:center!important;
+ justify-content:space-between!important;
+ gap:18px!important;
+ min-height:0;
+}
+.hub-mapping .hub-map-intro-body>div:first-child{min-width:0;flex:1}
+.hub-mapping .hub-map-intro h2{
+ font-size:clamp(16px,1.2vw,19px)!important;
+ line-height:1.15!important;
+ font-weight:730;
+ margin:0 0 3px!important;
+ letter-spacing:-.3px;
+}
+.hub-mapping .hub-map-intro p{
+ font-size:11px!important;
+ line-height:1.35!important;
+ color:#8496a0;
+ margin:0!important;
+ max-width:none;
+}
+.hub-mapping .hub-map-metric{
+ display:flex!important;
+ flex-direction:row!important;
+ align-items:center!important;
+ justify-content:center!important;
+ flex:0 0 auto!important;
+ min-width:0!important;
+ gap:8px!important;
+ padding:2px 0 2px 15px!important;
+ border:0!important;
+ border-left:1px solid #e5ecf1!important;
+}
+.hub-mapping .hub-map-metric b{
+ font-size:23px!important;
+ font-weight:760;
+ line-height:1;
+}
+.hub-mapping .hub-map-metric span{
+ font-size:10px;
+ line-height:1.2;
+ max-width:90px;
+}
+.hub-mapping>.row.between{
+ min-height:44px;
+ margin:0 0 8px!important;
+ justify-content:flex-end;
+}
+.hub-mapping>.row.between .badge{display:none!important}
+.hub-mapping>.row.between button{min-height:44px}
+.hub-mapping .v4-map-toolbar{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) auto!important;
+ align-items:center!important;
+ column-gap:12px!important;
+ row-gap:9px!important;
+ padding:0!important;
+ margin:0 0 12px!important;
+ background:transparent!important;
+ border:0!important;
+ box-shadow:none!important;
+}
+.hub-mapping .v4-map-toolbar>div:first-child{display:none!important}
+.hub-mapping .v4-map-toolbar>label{
+ display:block!important;
+ min-width:0!important;
+ max-width:none!important;
+ width:100%!important;
+ flex:initial!important;
+}
+.hub-mapping .v4-map-toolbar input{
+ display:block;
+ width:100%!important;
+ height:46px!important;
+ min-height:46px!important;
+ margin:0!important;
+ background:#fff!important;
+ border:1px solid #dce6eb!important;
+ border-radius:10px!important;
+ padding:0 14px!important;
+}
+.hub-mapping .hub-map-filters{
+ display:flex!important;
+ flex-direction:row!important;
+ align-items:center!important;
+ justify-content:flex-end!important;
+ gap:4px!important;
+ flex-wrap:nowrap!important;
+ width:auto!important;
+ max-width:none!important;
+ padding:3px!important;
+ margin:0!important;
+ background:#eef3f5!important;
+ border-radius:10px!important;
+}
+.hub-mapping .hub-filter{
+ white-space:nowrap;
+ min-height:40px!important;
+ min-width:44px!important;
+ padding:8px 10px!important;
+ font-size:12px;
+ border-radius:8px!important;
+ border:1px solid transparent!important;
+}
+.hub-mapping .hub-filter.active{
+ background:#fff!important;
+ color:#007e9d!important;
+ border-color:#d7e7ed!important;
+}
+.hub-mapping .v4-map-cards{margin-top:0!important}
+.hub-mapping .v4-map-cards .demand{min-height:190px!important}
+.hub-mapping .v4-map-cards .demand .row:last-child{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+}
+.hub-mapping .v4-map-cards .demand .row:last-child button{
+ min-width:44px;
+ min-height:44px;
+}
+@media(max-width:850px){
+ .hub-mapping .v4-map-toolbar{grid-template-columns:1fr!important}
+ .hub-mapping .hub-map-filters{justify-content:flex-start!important;justify-self:start!important}
+ .hub-mapping .hub-map-intro p{white-space:normal}
+}
+@media(max-width:590px){
+ .hub-mapping .hub-map-intro-body{gap:8px!important}
+ .hub-mapping .hub-map-metric{padding-left:8px!important}
+ .hub-mapping .hub-map-metric span{max-width:56px;font-size:9px}
+ .hub-mapping .hub-map-intro p{font-size:10px!important}
+ .hub-mapping .hub-filter{padding:8px!important;font-size:11px}
+}
