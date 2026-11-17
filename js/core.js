@@ -42,7 +42,7 @@ const {
     fmt
 } = Utils;
 /* Versão exibida na interface e no relatório. Ao publicar, atualize também CACHE em sw.js. */
-const APP_VERSION = '6.1';
+const APP_VERSION = '6.1.1';
 const Icons = {
     grip: '<path d="M8 5h.01M16 5h.01M8 12h.01M16 12h.01M8 19h.01M16 19h.01" stroke-width="4"/>',
     menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',

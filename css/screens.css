@@ -39,7 +39,8 @@
 .demand-card.presented { visibility: hidden; }
 
 /* ── Apresentação da demanda (js/present.js) ── */
-body.presenting { overflow: hidden; }
+/* Trava a rolagem sem tirar o espaço da barra de rolagem (senão o fundo inteiro se desloca). */
+html.presenting { overflow: hidden; scrollbar-gutter: stable; }
 .present-layer { position: fixed; inset: 0; z-index: calc(var(--z-toast) - 1); display: grid; place-items: center; }
 .present-scrim { position: absolute; inset: 0; background: var(--color-scrim-strong); backdrop-filter: blur(3px); }
 .present-move { position: relative; width: min(70rem, 92vw); height: min(84vh, 50rem); perspective: 2200px; transform-origin: center; }
