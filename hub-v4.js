@@ -10,7 +10,7 @@ const head=Render.head.bind(Render);
 Render.head=(i,actions='')=>head(i,actions);
 const mapping=Render.mapping.bind(Render);
 Render.mapping=()=>{
- const html=mapping();if(!State.demands().length)return html;
+ const html=mapping();if(!State.demands().some(d=>d.status!=='Arquivada'))return html;
  return html.replace('<div class="cards">','<div class="v4-map-toolbar"><div><small>MAPA DE OPORTUNIDADES</small><strong id="v4MapCount">'+State.demands().length+' oportunidades</strong></div><label><span class="visually-hidden">Buscar problemas</span><input id="v4MapSearch" aria-label="Buscar problemas" placeholder="Buscar problema, área ou descrição" autocomplete="off"></label></div><div class="cards v4-map-cards" id="v4MapCards">');
 };
 const classification=Render.classification.bind(Render);
@@ -171,9 +171,9 @@ function metric(sym,value,label,sub){
 const originalMapping=Render.mapping.bind(Render);
 Render.mapping=function(){
  const html=originalMapping();
- const ds=State.demands();
+ const ds=State.demands().filter(d=>d.status!=='Arquivada');
  const intro='<section class="hub-map-intro"><div class="hub-map-caption"><span class="hub-map-pulse"></span> DESCOBERTA · ETAPA 02</div>'+
- '<div class="hub-map-intro-body"><div><h2>O que podemos melhorar?</h2><p>Transforme situações do dia a dia em oportunidades claras de melhoria. Primeiro mapeamos; depois avaliamos.</p></div>'+
+ '<div class="hub-map-intro-body"><div><h2>O que podemos melhorar?</h2><p>Registre os problemas e depois classifique as demandas.</p></div>'+
  '<div class="hub-map-metric"><b>'+ds.length+'</b><span>oportunidades registradas</span></div></div></section>';
  const anchor='<div class="row between" style="margin-bottom:20px">';
  return html.replace(anchor,intro+anchor);
