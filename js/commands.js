@@ -11,6 +11,20 @@ const Commands = {
     },
     'toggle-sidebar': () => Layout.toggle(),
     'close-drawer': () => Layout.closeDrawer(),
+    'team-choose': b => Teams.choose(b.dataset.id),
+    'team-tab': b => Teams.open(b.dataset.tab, b.dataset.cycle || null),
+    'team-assign': b => Teams.assign(b.dataset.person, b.dataset.cycle || null),
+    'team-distribute': () => Teams.distribute(),
+    'team-edit': b => Teams.edit(b.dataset.cycle),
+    'team-add': () => Teams.add(),
+    'team-end': () => Teams.end(),
+    'review-team': b => {
+        Facilitator.flush();
+        State.session().selectedCycleId = b.dataset.cycle;
+        History.persist();
+        Render.header();
+        Render.page()
+    },
     'ui-density': b => Layout.setDensity(b.dataset.density),
     'map-filter': b => {
         State.mapFilter = b.dataset.filter;
@@ -55,6 +69,12 @@ const Commands = {
     'demand-edit': b => Demands.open(b.dataset.id),
     'demand-delete': b => Demands.remove(b.dataset.id),
     'demand-archive': b => Demands.archive(b.dataset.id),
+    'demand-purge': b => Demands.purge(b.dataset.id),
+    'demand-present': b => Presenter.open(b.dataset.id),
+    'present-close': () => Presenter.close(),
+    'present-prev': () => Presenter.go(-1),
+    'present-next': () => Presenter.go(1),
+    'present-edit': b => Presenter.edit(b.dataset.id),
     'demand-restore': b => Demands.restore(b.dataset.id),
     'class-select': b => {
         State.selectedDemand = b.dataset.id;
@@ -112,15 +132,18 @@ const Commands = {
     'review-flow-asis': () => {
         State.flowKind = 'asis';
         State.workView = 'flow';
+        State.workTab = 'team';
         Navigation.go(4)
     },
     'review-flow-tobe': () => {
         State.flowKind = 'tobe';
         State.workView = 'flow';
+        State.workTab = 'team';
         Navigation.go(4)
     },
     'review-kanban': () => {
         State.workView = 'kanban';
+        State.workTab = 'team';
         Navigation.go(4)
     },
     'backlog-start': b => Ranking.choose(b.dataset.id),

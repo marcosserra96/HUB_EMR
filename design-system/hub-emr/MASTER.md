@@ -28,6 +28,12 @@ A única exceção é o SVG do fluxo no relatório (`js/review.js`), que precisa
 | `--color-bg` / `-card` / `-subtle` / `-inset` | Página · cartão · área suave · área rebaixada |
 | `--color-border` / `-subtle` / `-strong` | Bordas |
 
+**Equipes** (`--team-blue|orange|purple|pink`, cada uma com `-subtle` e `-text`): qualquer elemento
+com `data-team="blue"` recebe `--team`, `--team-subtle` e `--team-text` (`css/teams.css`). A cor
+forte é só para faixas, bordas e marcadores; texto usa `--team-text`. Cor de equipe nunca indica
+status, e cores de status (verde, vermelho) nunca viram cor de equipe. Item sendo segurado no
+quadro usa contorno tracejado em `--color-primary`, para não se confundir com a equipe laranja.
+
 Todos os pares de texto e fundo passam 4,5:1 (WCAG AA). Texto sobre fundo colorido usa
 `--color-on-primary` ou `--color-white`.
 
@@ -78,6 +84,8 @@ Antes de criar um elemento, procure aqui. Não duplique.
 | `actionMenu(rótulo, itens)` | `core.js` | Menu "⋯" com as ações secundárias de um item. Excluir fica em vermelho, depois de um separador |
 | `.card`, `.grid-cards`, `.stack-list` | `components.css` | Cartões e listas |
 | `.segmented` | `components.css` | Filtro curto (2 a 4 opções) com `aria-pressed` |
+| Apresentação (`Presenter`) | `present.js`, `screens.css` | Card do mapeamento em tela grande, com giro de ida e volta. Movimento de 680 ms, só `transform` e `opacity`; com movimento reduzido vira um esmaecer |
+| Abas de equipe (`Render.teamBar`) | `teams.css` | Só no modo equipes, fixas abaixo da barra do topo: visão geral, uma aba por equipe e montagem |
 | `.toolbar` + `.search` | `components.css` | Busca e filtros acima de uma lista |
 | `Dialog.open` / `Dialog.confirm` | `dialog.js` | Janelas. Rodapé: secundário, depois principal; excluir à esquerda. Conteúdo largo: envolva em `.dialog-wide` |
 | `.selection-list` + `.sel-item` + `.sel-text` | `components.css` | Listas de escolha em janelas (sessões, ciclos, backup) |

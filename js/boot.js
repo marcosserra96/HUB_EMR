@@ -15,6 +15,7 @@ async function boot() {
     window.addEventListener('offline', connection);
     connection();
     Menus.init();
+    Presenter.init();
     try {
         const stored = await Storage.open();
         State.data = stored ? Transfer.validate(stored) : seed();

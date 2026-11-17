@@ -47,6 +47,7 @@
   --color-border-subtle: #e8eff1;
   --color-border-strong: #b6c8cd;
   --color-scrim: rgb(7 32 39 / .46);
+  --color-scrim-strong: rgb(7 32 39 / .62);   /* fundo da apresentação de demanda */
 
   /* Fluxo (quadro) */
   --color-node-start: #e5f5f3;
@@ -54,6 +55,12 @@
   --color-node-note: #fff8dc;
   --color-node-note-border: #d9a93a;
   --color-column-validation: #c9a227; /* marcador gráfico, não texto */
+
+  /* Equipes: forte (faixas, marcadores — não é texto), suave (fundo) e texto (AA sobre o suave e o branco). */
+  --team-blue: #0a6fa8;   --team-blue-subtle: #e3f1f9;   --team-blue-text: #0a5683;
+  --team-orange: #e8681e; --team-orange-subtle: #fdeee4; --team-orange-text: #a3440f;
+  --team-purple: #6d4fc2; --team-purple-subtle: #efebfa; --team-purple-text: #4f379a;
+  --team-pink: #c03c80;   --team-pink-subtle: #fbe8f1;   --team-pink-text: #8f2a5d;
 
   /* Tipografia: escala em rem, que acompanha a escala da interface. */
   --font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
