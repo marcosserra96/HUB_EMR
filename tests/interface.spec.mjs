@@ -211,12 +211,24 @@ test('arquivar oferece excluir de vez quando a demanda nunca teve ciclo', async 
   expect((await data(page)).demands.map(d => d.title)).toContain('Ordens impressas');
 });
 
-test('demanda com ciclo só pode ser arquivada', async ({ page }) => {
+test('demanda com ciclo pode ser excluída com confirmação reforçada e desfeita', async ({ page }) => {
   await openApp(page);
   await seedMeeting(page, { cycle: true });
+  await page.evaluate(() => { const c = State.cycle(); c.tasks.push({ id: uid(), title: 'Tarefa', description: '', type: 'process', acceptance: '', assignees: [], blocked: false, blockReason: '', notes: '', column: 'todo', cancelled: false, createdAt: now(), updatedAt: now(), sourceNode: null }); Storage.save(State.data); });
   await page.evaluate(() => Demands.archive(State.data.demands[0].id));
-  await expect(page.locator('#modal')).toContainText('só pode ser arquivada');
-  await expect(page.locator('#modal [data-action="demand-purge"]')).toHaveCount(0);
+  await page.locator('#modal [data-action="demand-delete"]').click();
+  await expect(page.locator('#modal')).toContainText('1 atividade do kanban');
+  await page.locator('#modal button[type="submit"]').click();
+  let d = await data(page);
+  expect(d.demands.map(x => x.title)).not.toContain('Leituras atípicas');
+  expect(d.cycles).toHaveLength(0);
+  expect(d.sessions[0].selectedCycleId).toBeNull();
+  const valid = await page.evaluate(() => { try { Transfer.validate(JSON.parse(JSON.stringify(State.data))); return true; } catch (e) { return e.message; } });
+  expect(valid).toBe(true);
+  await action(page, 'undo').first().click();
+  d = await data(page);
+  expect(d.cycles).toHaveLength(1);
+  expect(d.cycles[0].tasks).toHaveLength(1);
 });
 
 test('tocar no card apresenta a demanda inteira, navega e volta ao lugar', async ({ page }) => {

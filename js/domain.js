@@ -349,20 +349,38 @@ const Demands = {
         })
     },
     /** Exclusão definitiva só para demandas que nunca tiveram ciclo de trabalho (as outras são arquivadas). */
-    canDelete(id) {
-        return !State.data.cycles.some(c => c.demandId === id)
+    /** Ciclos de trabalho da demanda (fluxos, atividades e revisão). */
+    cyclesOf(id) {
+        return State.data.cycles.filter(c => c.demandId === id)
     },
     remove(id) {
         const d = State.data.demands.find(x => x.id === id);
         if (!d) return Feedback.toast('Demanda não encontrada.');
-        if (!this.canDelete(id)) return this.archive(id);
+        if (this.cyclesOf(id).length) return this.confirmPurge(id);
         Dialog.confirm('Excluir demanda?', `“${d.title}” será excluída do encontro. Esta ação pode ser desfeita logo em seguida.`, () => this.purge(id), 'Excluir', true);
     },
+    /** Demanda que já teve ciclo: a confirmação diz exatamente o que será apagado. */
+    confirmPurge(id) {
+        const d = State.data.demands.find(x => x.id === id),
+            cycles = this.cyclesOf(id),
+            tasks = cycles.reduce((n, c) => n + c.tasks.length, 0),
+            nodes = cycles.reduce((n, c) => n + c.flows.asis.nodes.length + c.flows.tobe.nodes.length, 0);
+        Dialog.open('Excluir demanda e o trabalho dela?', `<p class="confirm-text">“${esc(d.title)}” já teve ${plural(cycles.length,'ciclo')} de trabalho. Excluir apaga também:</p><ul class="purge-list">${nodes?`<li>${plural(nodes,'elemento')} dos fluxos AS IS e TO BE</li>`:''}${tasks?`<li>${plural(tasks,'atividade')} do kanban</li>`:''}<li>os textos da revisão e o histórico da demanda</li></ul>${notice('Se só quer tirar a demanda do mapeamento, use <b>Arquivar</b>: nada se perde. A exclusão pode ser desfeita logo em seguida pelo aviso no rodapé.','warning')}`, button('modal-close', 'Cancelar', 'secondary') + `<button class="danger" type="submit">${icon('trash')}Excluir tudo</button>`, () => this.purge(id))
+    },
     purge(id) {
-        if (!this.canDelete(id)) return;
+        const cycleIds = new Set(this.cyclesOf(id).map(c => c.id));
         History.commit('Demanda excluída', () => {
             State.data.demands = State.data.demands.filter(x => x.id !== id);
-            State.data.sessions.forEach(session => session.demandIds = session.demandIds.filter(demandId => demandId !== id));
+            State.data.cycles = State.data.cycles.filter(c => !cycleIds.has(c.id));
+            State.data.sessions.forEach(session => {
+                session.demandIds = session.demandIds.filter(demandId => demandId !== id);
+                /* Equipes ligadas aos ciclos apagados saem; com menos de duas, o modo equipes acaba. */
+                if (session.teams) {
+                    session.teams = session.teams.filter(t => !cycleIds.has(t.cycleId));
+                    if (session.teams.length < 2) delete session.teams
+                }
+                if (cycleIds.has(session.selectedCycleId)) session.selectedCycleId = session.teams?.[0]?.cycleId ?? null
+            })
         });
         Dialog.close();
         Render.header();
@@ -373,8 +391,8 @@ const Demands = {
         const d = State.data.demands.find(x => x.id === id);
         if (!d) return Feedback.toast('Demanda não encontrada.');
         if (d.status === 'Arquivada') return Feedback.toast('Esta demanda já está arquivada.');
-        const deletable = this.canDelete(id);
-        Dialog.open('Arquivar ou excluir?', `<p class="confirm-text"><b>Arquivar</b> tira “${esc(d.title)}” do mapeamento ativo, mas ela continua no backlog com o histórico.</p><p class="confirm-text">${deletable ? '<b>Excluir</b> apaga a demanda do encontro. Use para testes ou registros duplicados.' : 'Esta demanda já teve um ciclo de trabalho, por isso só pode ser arquivada.'}</p>`, (deletable ? button('demand-purge', icon('trash') + 'Excluir', 'danger-ghost', `data-id="${id}"`) : '') + button('modal-close', 'Cancelar', 'secondary') + `<button class="primary" type="submit">${icon('archive')}Arquivar</button>`, () => {
+        const cycles = this.cyclesOf(id).length;
+        Dialog.open('Arquivar ou excluir?', `<p class="confirm-text"><b>Arquivar</b> tira “${esc(d.title)}” do mapeamento ativo, mas ela continua no backlog com o histórico.</p><p class="confirm-text"><b>Excluir</b> apaga a demanda do encontro${cycles ? `, junto com ${plural(cycles,'ciclo')} de trabalho (fluxos e atividades)` : ''}. Use para testes ou registros duplicados.</p>`, button(cycles ? 'demand-delete' : 'demand-purge', icon('trash') + 'Excluir', 'danger-ghost', `data-id="${id}"`) + button('modal-close', 'Cancelar', 'secondary') + `<button class="primary" type="submit">${icon('archive')}Arquivar</button>`, () => {
             History.commit('Demanda arquivada', () => {
                 d.status = 'Arquivada';
             }, id);

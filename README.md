@@ -10,7 +10,7 @@ trabalho da demanda (fluxo AS IS / TO BE e kanban), revisão, relatório e backl
 - **Offline:** depois do primeiro acesso, funciona sem internet (PWA).
 - **Dados locais:** tudo fica no navegador onde o encontro foi feito. Não há servidor nem
   sincronização entre máquinas.
-- **Versão:** 6.1.1
+- **Versão:** 6.1.2
 
 ## Uso no encontro
 
