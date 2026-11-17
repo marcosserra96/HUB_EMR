@@ -51,6 +51,7 @@ const State = {
     modalCleanup: null,
     filter: '',
     mapFilter: 'all',
+    workTab: 'overview',
     mapSearch: '',
     statusFilter: '',
     expanded: new Set(),
@@ -76,6 +77,20 @@ const State = {
     },
     review() {
         return this.cycle()?.review || this.session().review
+    },
+    /** Equipes da sessão atual. Só há "modo equipes" com duas ou mais. */
+    teams() {
+        const t = this.session().teams;
+        return Array.isArray(t) ? t.filter(x => this.data.cycles.some(c => c.id === x.cycleId)) : []
+    },
+    teamMode() {
+        return this.teams().length >= 2
+    },
+    team(cycleId = this.session().selectedCycleId) {
+        return this.teamMode() ? this.teams().find(x => x.cycleId === cycleId) : undefined
+    },
+    teamOf(personId) {
+        return this.teamMode() ? this.teams().find(x => x.memberIds.includes(personId)) : undefined
     },
     historySource() {
         const {

@@ -45,6 +45,23 @@ const Transfer = {
                     if (new Set(s[k]).size !== s[k].length || s[k].some(x => !map.has(x))) fail('Referência inválida em ' + k)
                 }
                 if (s.selectedCycleId !== null && (!cc.has(s.selectedCycleId) || cc.get(s.selectedCycleId).sessionId !== s.id)) fail('Ciclo ativo inválido.');
+                if (s.teams !== undefined) {
+                    /* Equipes (opcional, 6.1+): 2 a 4, cada uma ligada a um ciclo desta sessão; pessoa em no máximo uma equipe. */
+                    arr(s.teams, 'Equipes', TEAM_LIMIT);
+                    const seenCycles = new Set(),
+                        seenPeople = new Set(),
+                        seenColors = new Set();
+                    for (const t of s.teams) {
+                        if (!obj(t) || !cc.has(t.cycleId) || cc.get(t.cycleId).sessionId !== s.id || seenCycles.has(t.cycleId)) fail('Equipe com ciclo inválido.');
+                        str(t.name, 'Nome da equipe', 60);
+                        if (!t.name.trim() || !Object.hasOwn(TeamColors, t.color) || seenColors.has(t.color)) fail('Equipe com nome ou cor inválida.');
+                        arr(t.memberIds, 'Integrantes da equipe');
+                        if (t.memberIds.some(x => !pp.has(x) || seenPeople.has(x))) fail('Integrante de equipe inválido ou repetido.');
+                        seenCycles.add(t.cycleId);
+                        seenColors.add(t.color);
+                        t.memberIds.forEach(x => seenPeople.add(x))
+                    }
+                }
                 if (s.pinHash !== null && (typeof s.pinHash !== 'string' || !/^pin-v1:\d{1,10}$/.test(s.pinHash))) fail('PIN inválido.');
                 review(s.review, 'Revisão da sessão')
             }
@@ -163,8 +180,10 @@ const Transfer = {
             data.sessions = data.sessions.filter(x => sessionIds.has(x.id)).map(x => ({
                 ...x,
                 demandIds: x.demandIds.filter(id => demandIds.has(id)),
-                selectedCycleId: cycleIds.has(x.selectedCycleId) ? x.selectedCycleId : null
+                selectedCycleId: cycleIds.has(x.selectedCycleId) ? x.selectedCycleId : null,
+                ...(Array.isArray(x.teams) ? { teams: x.teams.filter(t => cycleIds.has(t.cycleId)) } : {})
             }));
+            data.sessions.forEach(x => { if (x.teams && x.teams.length < 2) delete x.teams });
             const personIds = new Set([...data.sessions.flatMap(x => x.participantIds), ...cycles.flatMap(c => c.tasks.flatMap(t => t.assignees))]);
             data.participants = data.participants.filter(p => personIds.has(p.id));
             data.demands = data.demands.filter(d => demandIds.has(d.id));
@@ -214,7 +233,11 @@ const Transfer = {
             s.id = remap(s.id);
             s.participantIds = s.participantIds.map(remap);
             s.demandIds = s.demandIds.map(remap);
-            s.selectedCycleId = remap(s.selectedCycleId)
+            s.selectedCycleId = remap(s.selectedCycleId);
+            (s.teams || []).forEach(t => {
+                t.cycleId = remap(t.cycleId);
+                t.memberIds = t.memberIds.map(remap)
+            })
         }
         for (const p of raw.participants) p.id = remap(p.id);
         for (const d of raw.demands) {

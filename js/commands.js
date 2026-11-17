@@ -11,6 +11,20 @@ const Commands = {
     },
     'toggle-sidebar': () => Layout.toggle(),
     'close-drawer': () => Layout.closeDrawer(),
+    'team-choose': b => Teams.choose(b.dataset.id),
+    'team-tab': b => Teams.open(b.dataset.tab, b.dataset.cycle || null),
+    'team-assign': b => Teams.assign(b.dataset.person, b.dataset.cycle || null),
+    'team-distribute': () => Teams.distribute(),
+    'team-edit': b => Teams.edit(b.dataset.cycle),
+    'team-add': () => Teams.add(),
+    'team-end': () => Teams.end(),
+    'review-team': b => {
+        Facilitator.flush();
+        State.session().selectedCycleId = b.dataset.cycle;
+        History.persist();
+        Render.header();
+        Render.page()
+    },
     'ui-density': b => Layout.setDensity(b.dataset.density),
     'map-filter': b => {
         State.mapFilter = b.dataset.filter;
@@ -112,15 +126,18 @@ const Commands = {
     'review-flow-asis': () => {
         State.flowKind = 'asis';
         State.workView = 'flow';
+        State.workTab = 'team';
         Navigation.go(4)
     },
     'review-flow-tobe': () => {
         State.flowKind = 'tobe';
         State.workView = 'flow';
+        State.workTab = 'team';
         Navigation.go(4)
     },
     'review-kanban': () => {
         State.workView = 'kanban';
+        State.workTab = 'team';
         Navigation.go(4)
     },
     'backlog-start': b => Ranking.choose(b.dataset.id),

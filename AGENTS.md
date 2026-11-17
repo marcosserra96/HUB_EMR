@@ -16,14 +16,14 @@ sem build, sem framework, sem backend. Os dados ficam no IndexedDB do navegador.
 
 ```
 index.html        Moldura (menu, barra do topo, área de conteúdo). Sem CSS nem JS embutidos.
-css/              tokens → base → shell → components → screens → workspace → keyboard → report
+css/              tokens → base → shell → components → screens → workspace → teams → keyboard → report
 js/               scripts clássicos, carregados nesta ordem pelo index.html:
   core.js         utilitários, ícones, helpers de marcação (badge, empty, actionMenu, numbers,
                   notice, plural) e constantes do método (Steps, Criteria, Columns, Statuses…)
   state.js        IndexedDB (Storage) e estado (State); modelo de sessão
   history.js      avisos (Feedback) e histórico com desfazer, auditoria e salvamento (History)
   dialog.js       janela modal e campos de formulário
-  domain.js       regras: classificação, ranking/desempate, participantes, demandas
+  domain.js       regras: classificação, ranking/desempate, equipes (Teams), participantes, demandas
   layout.js       navegação entre etapas, menu lateral, escala, menus suspensos
   render.js       HTML de cada etapa
   flow.js         quadro AS IS / TO BE
@@ -36,7 +36,7 @@ js/               scripts clássicos, carregados nesta ordem pelo index.html:
   commands.js     mapa data-action → função, e eventos globais
   boot.js         inicialização e registro do PWA
 sw.js             cache offline (rede primeiro)
-tests/            Playwright: method.spec (regras) e interface.spec (telas e gestos)
+tests/            Playwright: method.spec (regras), interface.spec (telas e gestos), teams.spec (equipes)
 scripts/          serve.mjs (servidor local) e check.mjs (verificações estáticas)
 ```
 
@@ -53,6 +53,16 @@ mudou (`Render.page()`, `Render.classifyList()`, `Kanban.patch()`…).
 
 Preferências e câmera do quadro (escala, menu recolhido, zoom) **não** entram no desfazer: altere
 `State.data.ui` ou a `view` do fluxo e chame `History.persist()`.
+
+### Equipes (6.1)
+
+Quando o grupo escolhe duas demandas no ranking, cada **equipe é um ciclo** com nome, cor e
+integrantes (`session.teams = [{ cycleId, name, color, memberIds }]`, opcional, de 2 a 4).
+Trocar de aba de equipe só muda `session.selectedCycleId`; por isso fluxo, kanban, revisão e
+desfazer já valem por equipe sem código especial. A aba ativa (`State.workTab`: `overview`,
+`team` ou `setup`) é estado de tela e não é salva. Com uma demanda só, `teams` não existe e
+nada muda na tela. Confirmar uma demanda isolada ou "Voltar para uma equipe" remove `teams`;
+os ciclos continuam no histórico. Uma pessoa fica em no máximo uma equipe (validado na importação).
 
 ## Regras que não podem quebrar
 

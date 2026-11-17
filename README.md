@@ -4,10 +4,13 @@ Quadro colaborativo para conduzir as maratonas de melhoria e automação da Ener
 numa TV de toque. O grupo segue oito etapas: participantes, mapeamento, classificação, ranking,
 trabalho da demanda (fluxo AS IS / TO BE e kanban), revisão, relatório e backlog.
 
+- **Uma ou duas frentes:** no ranking, o grupo confirma uma demanda ou escolhe *Trabalhar com duas
+  demandas*. Com duas, o trabalho ganha abas: visão geral para acompanhar e uma aba colorida por
+  equipe, com fluxo e kanban próprios.
 - **Offline:** depois do primeiro acesso, funciona sem internet (PWA).
 - **Dados locais:** tudo fica no navegador onde o encontro foi feito. Não há servidor nem
   sincronização entre máquinas.
-- **Versão:** 6.0
+- **Versão:** 6.1
 
 ## Uso no encontro
 

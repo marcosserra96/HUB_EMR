@@ -42,7 +42,7 @@ const {
     fmt
 } = Utils;
 /* Versão exibida na interface e no relatório. Ao publicar, atualize também CACHE em sw.js. */
-const APP_VERSION = '6.0';
+const APP_VERSION = '6.1';
 const Icons = {
     grip: '<path d="M8 5h.01M16 5h.01M8 12h.01M16 12h.01M8 19h.01M16 19h.01" stroke-width="4"/>',
     menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
@@ -110,6 +110,10 @@ const statusTone = status => ({ Mapeada: '', Classificada: 'info', Selecionada: 
 const TaskTypes = { process: 'Processo', data: 'Dados', development: 'Desenvolvimento', test: 'Teste' };
 const NodeTypes = { step: 'Etapa', start: 'Início / fim', decision: 'Decisão', note: 'Observação' };
 const PortNames = { left: 'Esquerda', right: 'Direita', top: 'Topo', bottom: 'Base' };
+/* Equipes (modo com mais de uma demanda em trabalho). Cores em css/tokens.css (--team-*). */
+const TeamColors = { blue: 'azul', orange: 'laranja', purple: 'roxa', pink: 'rosa' };
+const TEAM_LIMIT = 4;
+const teamDot = color => `<span class="team-dot" data-team="${color}" aria-hidden="true"></span>`;
 /* Etapas do método: [nome no menu e no título, descrição curta da página]. */
 const Steps = [
     ['Participantes', 'Registre quem participa da construção da melhoria neste encontro.'],

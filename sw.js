@@ -1,10 +1,10 @@
 /* Hub EMR · Service worker: rede primeiro, cache como reserva para uso offline.
    Ao publicar uma versão, mude CACHE (e APP_VERSION em js/core.js) para renovar os arquivos. */
-const CACHE = 'hub-emr-v6-0';
+const CACHE = 'hub-emr-v6-1';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './icon.svg', './assets/energisa-logo.svg',
   './css/tokens.css', './css/base.css', './css/shell.css', './css/components.css',
-  './css/screens.css', './css/workspace.css', './css/keyboard.css', './css/report.css',
+  './css/screens.css', './css/workspace.css', './css/teams.css', './css/keyboard.css', './css/report.css',
   './js/core.js', './js/state.js', './js/history.js', './js/dialog.js', './js/domain.js',
   './js/layout.js', './js/render.js', './js/flow.js', './js/kanban.js', './js/pointers.js',
   './js/keyboard.js', './js/review.js', './js/transfer.js', './js/sessions.js',

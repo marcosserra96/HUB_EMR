@@ -60,65 +60,158 @@ const Ranking = {
         if (d?.status === 'Arquivada') return Feedback.toast('Restaure esta demanda no backlog antes de iniciar um ciclo.');
         if (!d || !Classification.complete(d)) return Feedback.toast('Conclua a classificação da demanda.');
         const incompletes = State.demands().filter(x => x.status !== 'Arquivada' && !Classification.complete(x));
-        Dialog.confirm('Confirmar demanda escolhida', `“${d.title}” será trabalhada agora: um novo ciclo de trabalho é aberto com fluxos e kanban. As demais demandas continuam no backlog.${incompletes.length?' Atenção: '+plural(incompletes.length,'demanda ainda não foi classificada','demandas ainda não foram classificadas')+'.':''}`, () => this.start(d), 'Confirmar e iniciar')
+        Dialog.confirm('Confirmar demanda escolhida', `“${d.title}” será trabalhada agora: um novo ciclo de trabalho é aberto com fluxos e kanban. As demais demandas continuam no backlog.${State.teamMode()?' As equipes atuais serão encerradas; o fluxo e as atividades delas ficam no histórico de ciclos.':''}${incompletes.length?' Atenção: '+plural(incompletes.length,'demanda ainda não foi classificada','demandas ainda não foram classificadas')+'.':''}`, () => this.start(d), 'Confirmar e iniciar')
+    },
+    /** Novo ciclo de trabalho para a demanda (sem gravar; use dentro de History.commit). */
+    newCycle(d) {
+        const view = () => ({ x: 40, y: 40, z: 1 });
+        const cycle = {
+            id: uid(),
+            demandId: d.id,
+            sessionId: State.session().id,
+            selectedAt: now(),
+            evaluation: { ratings: clone(d.ratings), score: Classification.score(d) },
+            flows: { asis: { nodes: [], edges: [], view: view() }, tobe: { nodes: [], edges: [], view: view() } },
+            tasks: [],
+            review: newReview()
+        };
+        cycle.review.fields.area = d.area;
+        cycle.review.fields.problem = d.description;
+        State.data.cycles.push(cycle);
+        if (!State.session().demandIds.includes(d.id)) State.session().demandIds.push(d.id);
+        d.status = 'Selecionada';
+        d.selections.push({ at: cycle.selectedAt, sessionId: cycle.sessionId, cycleId: cycle.id, ratings: clone(d.ratings), score: Classification.score(d) });
+        return cycle
+    },
+    /** Demandas que estavam em trabalho deixam de ser "Selecionada" quando um novo ciclo começa. */
+    releaseCurrent(except = []) {
+        const ids = State.teamMode() ? State.teams().map(t => State.data.cycles.find(c => c.id === t.cycleId)?.demandId) : [State.cycle()?.demandId];
+        ids.filter(id => id && !except.includes(id)).forEach(id => {
+            const previous = State.data.demands.find(x => x.id === id);
+            if (previous?.status === 'Selecionada') previous.status = 'Em desenvolvimento'
+        })
     },
     start(d) {
-        const existing = State.cycle();
         History.commit('Demanda escolhida para novo ciclo', () => {
-            if (existing && existing.demandId !== d.id) {
-                const previous = State.data.demands.find(x => x.id === existing.demandId);
-                if (previous?.status === 'Selecionada') previous.status = 'Em desenvolvimento'
-            }
-            const cycle = {
-                id: uid(),
-                demandId: d.id,
-                sessionId: State.session().id,
-                selectedAt: now(),
-                evaluation: {
-                    ratings: clone(d.ratings),
-                    score: Classification.score(d)
-                },
-                flows: {
-                    asis: {
-                        nodes: [],
-                        edges: [],
-                        view: {
-                            x: 40,
-                            y: 40,
-                            z: 1
-                        }
-                    },
-                    tobe: {
-                        nodes: [],
-                        edges: [],
-                        view: {
-                            x: 40,
-                            y: 40,
-                            z: 1
-                        }
-                    }
-                },
-                tasks: [],
-                review: newReview()
-            };
-            cycle.review.fields.area = d.area;
-            cycle.review.fields.problem = d.description;
-            State.data.cycles.push(cycle);
-            State.session().selectedCycleId = cycle.id;
-            if (!State.session().demandIds.includes(d.id)) State.session().demandIds.push(d.id);
-            d.status = 'Selecionada';
-            d.selections.push({
-                at: cycle.selectedAt,
-                sessionId: cycle.sessionId,
-                cycleId: cycle.id,
-                ratings: clone(d.ratings),
-                score: Classification.score(d)
-            })
+            this.releaseCurrent([d.id]);
+            /* Um ciclo único encerra o modo equipes desta sessão; o trabalho das equipes fica no histórico. */
+            delete State.session().teams;
+            State.session().selectedCycleId = this.newCycle(d).id
         }, d.id);
         State.workView = 'flow';
         State.flowKind = 'asis';
         Navigation.go(4);
         Feedback.toast('Demanda confirmada. Novo ciclo pronto.', true)
+    }
+};
+/** Trabalho com mais de uma demanda ao mesmo tempo: cada equipe é um ciclo com nome, cor e integrantes.
+    Trocar de equipe = trocar o ciclo selecionado da sessão, então fluxo, kanban e revisão valem por equipe. */
+const Teams = {
+    /** Ranking → escolher a segunda demanda e iniciar as duas equipes. */
+    choose(firstId) {
+        const first = State.data.demands.find(x => x.id === firstId);
+        const others = Ranking.sort(State.activeDemands().filter(d => Classification.complete(d) && d.id !== firstId));
+        if (!others.length) return Feedback.toast('Classifique mais uma demanda para trabalhar com duas equipes.');
+        Dialog.open('Trabalhar com duas demandas', `<p>O grupo se divide em duas equipes, cada uma com a sua demanda, fluxo e kanban. Na tela de trabalho, abas alternam entre a visão geral e cada equipe.</p><div class="pair-first">${teamDot('blue')}<span class="sel-text"><small>Equipe azul</small><b>${esc(first.title)}</b></span><span class="pair-score">${Utils.number(Classification.score(first))} pts</span></div><fieldset class="fieldset"><legend>Demanda da equipe laranja</legend><div class="selection-list">${others.map((d,i)=>`<label class="check pair-option"><input type="radio" name="second" value="${d.id}" ${i===0?'checked':''}><span class="sel-text"><b>${esc(d.title)}</b><small>${esc(d.area)}${i===0?' · próxima do ranking':''}</small></span><span class="pair-score">${Utils.number(Classification.score(d))} pts</span></label>`).join('')}</div></fieldset>${State.cycle()?notice('O ciclo em andamento continua salvo no histórico.','info'):''}`, saveFooter('Confirmar e montar equipes'), () => {
+            const second = State.data.demands.find(x => x.id === new FormData($('#modalForm')).get('second'));
+            if (!second) return Dialog.error('Escolha a segunda demanda.');
+            Dialog.close();
+            this.start([first, second])
+        })
+    },
+    start(demands) {
+        History.commit('Equipes iniciadas', () => {
+            Ranking.releaseCurrent(demands.map(d => d.id));
+            const colors = Object.keys(TeamColors);
+            const s = State.session();
+            s.teams = demands.map((d, i) => ({ cycleId: Ranking.newCycle(d).id, name: 'Equipe ' + TeamColors[colors[i]], color: colors[i], memberIds: [] }));
+            s.selectedCycleId = s.teams[0].cycleId;
+            /* Modo imersivo: o menu recolhe para dar espaço às abas (a pessoa pode reabrir). */
+            State.data.ui = { ...State.data.ui, sidebarCollapsed: true }
+        }, demands[0].id);
+        State.workView = 'flow';
+        State.flowKind = 'asis';
+        State.workTab = 'setup';
+        Navigation.go(4);
+        Feedback.toast('Equipes criadas. Defina quem fica em cada uma.', true)
+    },
+    /** Abre a aba da equipe (ou a visão geral / montagem). Não entra no desfazer. */
+    open(tab, cycleId = null) {
+        State.workTab = tab;
+        if (cycleId && cycleId !== State.session().selectedCycleId) {
+            State.session().selectedCycleId = cycleId;
+            Flow.viewport = null;
+            History.persist()
+        }
+        Render.header();
+        Render.page();
+        $('#content').scrollTo?.(0, 0);
+        window.scrollTo(0, 0)
+    },
+    assign(personId, cycleId) {
+        const p = State.data.participants.find(x => x.id === personId);
+        const target = State.teams().find(t => t.cycleId === cycleId);
+        if (!p || target && target.memberIds.includes(personId) || !target && !State.teamOf(personId)) return;
+        History.commit(target ? p.name + ' na ' + target.name : p.name + ' sem equipe', () => {
+            State.session().teams.forEach(t => t.memberIds = t.memberIds.filter(x => x !== personId));
+            if (target) State.session().teams.find(t => t.cycleId === cycleId).memberIds.push(personId)
+        });
+        Render.page()
+    },
+    /** Distribui quem está sem equipe, equilibrando o tamanho e misturando as áreas. */
+    distribute() {
+        const free = State.people().filter(p => !State.teamOf(p.id) && !['Ausente', 'Inativa'].includes(p.status));
+        if (!free.length) return Feedback.toast('Todas as pessoas presentes já estão em uma equipe.');
+        History.commit('Equipes distribuídas automaticamente', () => {
+            const teams = State.session().teams;
+            [...free].sort((a, b) => a.area.localeCompare(b.area, 'pt-BR') || a.name.localeCompare(b.name, 'pt-BR')).forEach(p => {
+                const smallest = teams.reduce((m, t) => t.memberIds.length < m.memberIds.length ? t : m, teams[0]);
+                smallest.memberIds.push(p.id)
+            })
+        });
+        Render.page();
+        Feedback.toast(plural(free.length, 'pessoa distribuída', 'pessoas distribuídas') + '.', true)
+    },
+    edit(cycleId) {
+        const t = State.session().teams.find(x => x.cycleId === cycleId);
+        const used = State.teams().filter(x => x !== t).map(x => x.color);
+        Dialog.open('Editar equipe', field('name', 'Nome da equipe', t.name, 'text', true, 'maxlength="60"') + `<fieldset class="fieldset"><legend>Cor</legend><div class="color-options">${Object.entries(TeamColors).map(([c,label])=>`<label class="check color-option"><input type="radio" name="color" value="${c}" ${c===t.color?'checked':''} ${used.includes(c)?'disabled':''}>${teamDot(c)}<span>${label[0].toUpperCase()+label.slice(1)}${used.includes(c)?' · em uso':''}</span></label>`).join('')}</div></fieldset>`, saveFooter(), () => {
+            const v = Object.fromEntries(new FormData($('#modalForm')));
+            if (!v.name.trim()) return Dialog.error('Informe o nome da equipe.');
+            History.commit('Equipe editada', () => Object.assign(State.session().teams.find(x => x.cycleId === cycleId), { name: v.name.trim(), color: v.color }));
+            Dialog.close();
+            Render.page()
+        })
+    },
+    add() {
+        if (State.teams().length >= TEAM_LIMIT) return Feedback.toast('O limite é de ' + TEAM_LIMIT + ' equipes.');
+        const busy = State.teams().map(t => State.data.cycles.find(c => c.id === t.cycleId).demandId);
+        const options = Ranking.sort(State.activeDemands().filter(d => Classification.complete(d) && !busy.includes(d.id)));
+        if (!options.length) return Feedback.toast('Não há outra demanda classificada para uma nova equipe.');
+        const color = Object.keys(TeamColors).find(c => !State.teams().some(t => t.color === c));
+        Dialog.open('Nova equipe', `<p>A ${'equipe ' + TeamColors[color]} trabalha em uma demanda própria.</p><div class="selection-list">${options.map((d,i)=>`<label class="check pair-option"><input type="radio" name="demand" value="${d.id}" ${i===0?'checked':''}><span class="sel-text"><b>${esc(d.title)}</b><small>${esc(d.area)}</small></span><span class="pair-score">${Utils.number(Classification.score(d))} pts</span></label>`).join('')}</div>`, saveFooter('Criar equipe'), () => {
+            const d = State.data.demands.find(x => x.id === new FormData($('#modalForm')).get('demand'));
+            if (!d) return Dialog.error('Escolha uma demanda.');
+            History.commit('Equipe adicionada', () => State.session().teams.push({ cycleId: Ranking.newCycle(d).id, name: 'Equipe ' + TeamColors[color], color, memberIds: [] }), d.id);
+            Dialog.close();
+            Render.header();
+            Render.page()
+        })
+    },
+    /** Volta para uma equipe só, mantendo o ciclo escolhido; os demais ficam no histórico. */
+    end() {
+        const keep = State.cycle();
+        Dialog.confirm('Voltar para uma equipe?', `O trabalho continua só em “${State.demand()?.title}”. O fluxo e as atividades das outras equipes ficam salvos no histórico de ciclos, e as demandas delas voltam ao backlog como “Em desenvolvimento”.`, () => {
+            History.commit('Equipes encerradas', () => {
+                Ranking.releaseCurrent([keep.demandId]);
+                delete State.session().teams;
+                State.session().selectedCycleId = keep.id
+            }, keep.demandId);
+            State.workTab = 'overview';
+            Render.header();
+            Render.page();
+            Feedback.toast('Agora com uma equipe.', true)
+        }, 'Voltar para uma equipe')
     }
 };
 const Participants = {
@@ -164,7 +257,10 @@ const Participants = {
         Dialog.confirm('Excluir participante?', p.name + ' será removido do cadastro desta sessão.', () => {
             History.commit('Participante excluído', () => {
                 State.data.participants = State.data.participants.filter(x => x.id !== id);
-                State.data.sessions.forEach(s => s.participantIds = s.participantIds.filter(x => x !== id))
+                State.data.sessions.forEach(s => {
+                    s.participantIds = s.participantIds.filter(x => x !== id);
+                    (s.teams || []).forEach(t => t.memberIds = t.memberIds.filter(x => x !== id))
+                })
             });
             Render.page()
         }, 'Excluir', true)
