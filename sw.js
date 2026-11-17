@@ -1,4 +1,4 @@
-const CACHE='hub-emr-touch-v5-2';
+const CACHE='hub-emr-touch-v5-3';
 const ASSETS=['./','./index.html','./hub-v4.css','./hub-v4.js','./manifest.webmanifest','./icon.svg','./assets/energisa-logo.svg'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('hub-emr-touch-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
