@@ -486,3 +486,93 @@ button:focus-visible{outline-offset:3px}
 }
 @media(prefers-reduced-motion:reduce){.hub-hero,.hub-overview-metric,.hub-map-intro,.hub-filter{transition:none!important}}
 @media print{.hub-hero,.hub-overview-strip,.hub-map-intro,.hub-map-filters,.hub-nav-group{display:none!important}}
+
+
+/* Hub EMR Touch 5.1 — quiet minimalist design pass.
+   Scoped CSS overrides preserve layout semantics and interaction sizes. */
+:root{--hub-soft:#f8fafb;--hub-border:#e8eef1;--hub-secondary:#758994}
+.main{background:#f8fafb}
+.sidebar{background:#092f41;box-shadow:none;border-right:1px solid #16495a}
+.sidebar::before,.sidebar::after{display:none!important}
+.brand-lockup{padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:3px}
+.brand-logo{width:min(100%,165px);filter:none}
+.brand-product{font-size:10px;font-weight:650;color:#f1f7f8;line-height:1.45}
+.brand-unit{font-size:8px;letter-spacing:1.5px;color:#a8bdc6}
+.brand-unit i{background:#f37021}
+.hub-nav-group{font-size:9px;color:#85a6b4;letter-spacing:1.1px;padding:11px 10px 4px;font-weight:700}
+.sidebar .nav button{color:#c9dce2;border:0;min-height:45px;border-radius:9px;font-weight:560}
+.sidebar .nav button.active{background:#eaf5f8;color:#0c4155;font-weight:730;box-shadow:none}
+.sidebar .nav button.active::before{top:10px;bottom:10px;width:3px}
+.sidebar .nav button:not(.active):hover{background:rgba(255,255,255,.07)}
+.sidebar .sidefoot{border-top-color:rgba(255,255,255,.1);color:#99b7c3}
+.topbar{background:#fff;border-bottom:1px solid #e8eff2}
+.pagehead h1{font-size:clamp(22px,1.7vw,28px);color:#153e4c}
+.pagehead .eyebrow{font-weight:750;color:#64818c}
+.pagehead p{color:#84969e}
+.hub-overview .pagehead{margin-bottom:13px}
+.hub-hero{grid-template-columns:1fr;min-height:0;padding:clamp(24px,2.25vw,34px) clamp(26px,3vw,44px);border-radius:15px;background:#103f51;box-shadow:none;gap:0}
+.hub-hero::before,.hub-hero::after{display:none!important}
+.hub-hero-content{max-width:100%;gap:12px;justify-content:center}
+.hub-hero-kicker{color:#9dc9d4;font-size:10px;letter-spacing:1.3px;font-weight:760}
+.hub-live-dot{width:7px;height:7px;box-shadow:none}
+.hub-hero h2{display:block;position:static;white-space:normal;line-height:1.19!important;font-size:clamp(25px,2.35vw,40px)!important;font-weight:720;letter-spacing:-1px;max-width:950px;color:#fff;margin:0!important;padding:0!important;overflow:visible}
+.hub-hero h2::after{display:none!important}
+.hub-hero h2 em{color:#fff;font-style:normal}
+.hub-hero p{font-size:clamp(13px,.95vw,15px);line-height:1.6;color:#c5dce3;max-width:680px;margin:0}
+.hub-hero-actions{gap:17px;min-height:48px;margin-top:3px}
+.hub-hero-main{border-radius:10px;background:#f37021!important;color:#102f3a!important;min-height:44px;box-shadow:none;padding:10px 16px;font-weight:750}
+.hub-hero-session{font-size:11px;color:#b3cdd5;max-width:350px}
+.hub-hero-art{display:none!important}
+.hub-overview-strip{gap:0;margin:16px 0 25px;background:#fff;border:1px solid #e6edf0;border-radius:13px;overflow:hidden}
+.hub-overview-metric{border:0;border-right:1px solid #edf1f3;border-radius:0;background:#fff;box-shadow:none;min-height:78px;padding:14px 20px;gap:11px}
+.hub-overview-metric:last-child{border-right:0}
+.hub-metric-symbol{height:34px;width:34px;background:transparent!important;color:#557b88!important;border-radius:9px}
+.hub-metric-symbol svg{height:20px;width:20px}
+.hub-metric-copy{grid-template-columns:auto 1fr;column-gap:11px;row-gap:2px}
+.hub-metric-copy strong{font-size:clamp(24px,1.8vw,30px);font-weight:720;letter-spacing:-.6px;color:#163f50;grid-row:span 2}
+.hub-metric-copy span{font-size:12px;font-weight:710;color:#345564}
+.hub-metric-copy small{font-size:11px;color:#889aa2}
+.hub-overview .v4-participant-listhead{margin:0 0 12px!important}
+.hub-overview .v4-participant-listhead h2{font-size:17px;color:#294b5a;letter-spacing:-.35px}
+.hub-overview .v4-participant-empty{background:#fff;border:1px solid #e4ecef;border-radius:12px;padding:16px 18px;min-height:87px;box-shadow:none}
+.hub-overview .v4-participant-empty-icon{height:39px;width:39px;background:#f0f6f8;border-radius:10px}
+.hub-overview .v4-participant-empty-icon svg{height:21px;width:21px}
+.hub-overview .v4-participant-empty-copy h3{font-size:14px;color:#294c5b}
+.hub-overview .v4-participant-empty-copy p{font-size:12px;color:#859aa3}
+.hub-overview .v4-participant-empty>button{min-height:44px}
+.hub-mapping .hub-map-intro{background:#fff;border:1px solid #e5edf0;border-radius:13px;padding:19px 24px}
+.hub-mapping .hub-map-intro::before{display:none}
+.hub-mapping .hub-map-caption{color:#658a98;letter-spacing:1.15px}
+.hub-mapping .hub-map-intro h2{font-size:clamp(22px,1.8vw,28px);font-weight:710}
+.hub-mapping .hub-map-intro p{color:#788c96}
+.hub-map-metric{border-left:1px solid #e6edf0}
+.hub-map-metric b{font-weight:720}
+.hub-mapping .v4-map-cards .demand{border-color:#e6edf0;box-shadow:none}
+.hub-mapping .v4-map-cards .demand::before{height:3px;opacity:.75}
+.hub-mapping .v4-map-cards .demand:hover{box-shadow:0 6px 20px rgba(10,50,68,.06)}
+.panel,.card{box-shadow:none}
+@media(max-height:800px){
+ .hub-hero{padding:19px 27px}
+ .hub-hero h2{font-size:clamp(24px,2vw,34px)!important}
+ .hub-hero-content{gap:9px}
+ .hub-overview-strip{margin:11px 0 17px}
+ .hub-overview-metric{min-height:65px;padding:9px 13px}
+}
+@media(max-width:900px){
+ .hub-overview-strip{gap:0}
+ .hub-overview-metric{padding:10px}
+ .hub-metric-copy{grid-template-columns:1fr}
+ .hub-metric-copy strong{grid-row:auto}
+}
+@media(max-width:760px){
+ .hub-overview-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hub-overview-metric{border-bottom:1px solid #edf1f3}
+ .hub-overview-metric:nth-child(2){border-right:0}
+ .hub-overview-metric:last-child{grid-column:1/-1;border-bottom:0}
+}
+@media(max-width:550px){
+ .hub-hero{padding:18px;border-radius:12px}
+ .hub-hero h2{font-size:27px!important}
+ .hub-overview-metric{gap:5px}
+ .hub-hero-session{max-width:250px}
+}
