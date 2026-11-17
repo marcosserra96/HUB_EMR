@@ -271,3 +271,44 @@ dialog{width:min(690px,calc(100vw - 30px));border-radius:20px}
 .board-hint{font-size:12px;color:#647f8b;line-height:1.4;padding:2px 4px}
 @media(max-width:1250px){.kanban{gap:8px}.column{padding:8px}}
 @media(prefers-reduced-motion:reduce){.task,.node,.work-header{transition:none!important}}
+
+/* Hub EMR Touch 4.5 — Energisa visual identity
+   Decorative adjustments only. Domain logic, touch targets and data remain intact. */
+:root{--brand-energisa-blue:#009bc1;--brand-energisa-orange:#f37021;--brand-deep:#073d50}
+.sidebar{isolation:isolate;position:sticky;overflow:hidden;background:linear-gradient(166deg,#093d51 0%,#085a70 52%,#073c50 100%);box-shadow:9px 0 26px rgba(3,46,62,.11)}
+.sidebar::before{content:"";position:absolute;width:275px;height:285px;right:-190px;top:-115px;border:38px solid rgba(0,155,193,.15);border-radius:46% 56% 44% 56%;transform:rotate(-30deg);pointer-events:none;z-index:-1}
+.sidebar::after{content:"";position:absolute;width:265px;height:280px;left:-195px;bottom:-172px;border:37px solid rgba(243,112,33,.21);border-radius:55% 38% 60% 42%;transform:rotate(25deg);pointer-events:none;z-index:-1}
+.brand-lockup{position:relative;display:flex;flex-direction:column;gap:9px;padding:3px 8px 13px;margin-bottom:2px;border-bottom:1px solid rgba(170,218,229,.22);z-index:1}
+.brand-logo-frame{min-height:57px;display:flex;align-items:center;justify-content:flex-start}
+.brand-logo{display:block;width:min(100%,178px);height:auto;aspect-ratio:384/125;object-fit:contain;object-position:left center;filter:drop-shadow(0 2px 4px rgba(0,25,32,.12))}
+.brand-copy{display:flex;flex-direction:column;gap:5px;line-height:1.2}
+.brand-product{font-size:clamp(10px,.72vw,12px);line-height:1.4;color:#fff;font-weight:750;letter-spacing:.14px}
+.brand-amp{color:#ff9a54}
+.brand-unit{font-size:9px;font-weight:800;letter-spacing:1.9px;color:#a6d9e3;display:flex;align-items:center;gap:7px}
+.brand-unit i{width:12px;height:2px;display:inline-block;background:#f37021;border-radius:3px}
+.sidebar .nav{position:relative;z-index:1}
+.sidebar .nav button{border-radius:11px;color:#e5f4f6;border:1px solid transparent}
+.sidebar .nav button:not(.active):hover{background:#ffffff18;border-color:#ffffff14}
+.sidebar .nav button.active{background:#ffffff;color:#093f51;border-left:4px solid #f37021;padding-left:5px;box-shadow:0 7px 24px rgba(0,27,42,.2);transform:none}
+.sidebar .nav button.active .num{background:#f37021;color:#fff;border-color:#f37021}
+.sidebar .nav button.done:not(.active) .num{background:#087f95;border-color:#5badbd}
+.sidebar .sidefoot{position:relative;z-index:1;border-top:1px solid rgba(188,227,235,.25)}
+.topbar{border-top:3px solid #f37021;box-shadow:0 3px 17px rgba(6,56,73,.06)}
+.session-title{color:#0a4154;font-weight:750}
+.pagehead h1{position:relative;display:inline-block;padding-bottom:7px;letter-spacing:-.65px}
+.pagehead h1::after{content:"";position:absolute;bottom:0;left:0;height:3px;width:54px;border-radius:8px;background:linear-gradient(90deg,#f37021 0%,#009bc1 100%)}
+.pagehead .eyebrow{color:#0b819c;font-weight:800}
+.panel.stat{position:relative;overflow:hidden;border-color:#dde8eb}
+.panel.stat::before{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:#009bc1;opacity:.55}
+.panel.stat:nth-child(2)::before{background:#f37021}
+.panel.stat:nth-child(3)::before{background:#0b7891}
+.panel.stat .symbol{background:linear-gradient(135deg,#e2f2f6,#edf8fa);color:#087b98}
+button.primary{background:linear-gradient(115deg,#084b60,#00637c);border-color:#08546c;box-shadow:0 4px 11px rgba(0,63,85,.13)}
+button.primary:hover{background:linear-gradient(115deg,#0b586e,#00738d)}
+.modal-head,.v4-modal-head{border-top:3px solid #f37021}
+.rank-card.recommended{border-color:#f37021;background:linear-gradient(98deg,#fff5eb 0%,#fff 58%)}
+.rank-card.recommended .rank-position{background:#f37021}
+.work-header{border-left:4px solid #f37021}
+@media(max-height:850px){.brand-lockup{gap:6px;padding:0 8px 8px}.brand-logo-frame{min-height:45px}.brand-logo{width:min(100%,157px)}.brand-copy{gap:3px}.brand-product{font-size:10px}.brand-unit{font-size:8px}}
+@media(max-width:1100px){.brand-lockup{padding:4px 1px 10px;gap:2px;align-items:center}.brand-logo-frame{min-height:40px;justify-content:center}.brand-logo{width:59px;max-width:none;object-fit:contain}.brand-copy{display:none}.sidebar::before{width:115px;height:150px;right:-100px;top:-45px}.sidebar::after{display:none}}
+@media print{.pagehead h1::after{display:none}.topbar{border-top:0}}
