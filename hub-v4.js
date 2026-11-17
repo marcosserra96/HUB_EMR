@@ -141,13 +141,13 @@ Render.participants=function(){
  const total=cycle?.tasks?.length||0;
  const title=State.session()?.title||'Encontro de melhoria';
  const hero='<section class="hub-hero" aria-label="Visão do encontro">'+
- '<div class="hub-hero-content"><div class="hub-hero-kicker"><span class="hub-live-dot"></span> WORKSPACE DE MELHORIA · ENCONTRO ATIVO</div>'+
- '<h2>Da oportunidade à <em>transformação.</em></h2>'+
- '<p>Um espaço para construir melhorias com o time. Identifique desafios, defina prioridades e acompanhe as entregas.</p>'+
+ '<div class="hub-hero-content"><div class="hub-hero-kicker"><span class="hub-live-dot"></span> ENCONTRO EM ANDAMENTO</div>'+
+ '<h2>Melhorias construídas em conjunto.</h2>'+
+ '<p>Registre oportunidades, escolha prioridades e acompanhe o trabalho do grupo.</p>'+
  '<div class="hub-hero-actions">'+
- button('next-stage','Explorar oportunidades '+icon('arrow'),'hub-hero-main','data-step="1"')+
+ button('next-stage','Ir para mapeamento '+icon('arrow'),'hub-hero-main','data-step="1"')+
  '<span class="hub-hero-session">'+icon('flag')+' '+esc(title)+'</span></div></div>'+
- '<div class="hub-hero-art" aria-hidden="true"><div class="hub-art-ring ring-a"></div><div class="hub-art-ring ring-b"></div><div class="hub-art-core"><span>EMR</span><b>HUB</b></div><div class="hub-art-accent"></div></div>'+
+ ''+
  '</section>';
  const summary='<section class="hub-overview-strip" aria-label="Indicadores do encontro">'+
  metric('users',people.length,'Participantes','Pessoas vinculadas')+
