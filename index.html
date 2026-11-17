@@ -95,7 +95,7 @@ const Demands={duplicates(d){const norm=s=>s.toLocaleLowerCase().normalize('NFD'
    State.data.demands=State.data.demands.filter(x=>x.id!==id);
    State.data.sessions.forEach(session=>session.demandIds=session.demandIds.filter(demandId=>demandId!==id));
   });
-  Dialog.close();Render.header();Render.page();Feedback.toast('Demanda excluída.',true);
+  Render.header();Render.page();Feedback.toast('Demanda excluída.',true);
  },'Excluir',true);
 },
 archive(id){
@@ -103,7 +103,7 @@ archive(id){
  if(d.status==='Arquivada')return Feedback.toast('Esta demanda já está arquivada.');
  Dialog.confirm('Arquivar demanda?',d.title+' sairá do mapeamento ativo, mas continuará no backlog com seu histórico.',()=>{
   History.commit('Demanda arquivada',()=>{d.status='Arquivada';},id);
-  Dialog.close();Render.header();Render.page();Feedback.toast('Demanda arquivada. Você pode restaurá-la no backlog.',true);
+  Render.header();Render.page();Feedback.toast('Demanda arquivada. Você pode restaurá-la no backlog.',true);
  },'Arquivar');
 },
 restore(id){
@@ -111,7 +111,7 @@ restore(id){
  if(d.status!=='Arquivada')return Feedback.toast('A demanda não está arquivada.');
  Dialog.confirm('Restaurar demanda?',d.title+' voltará a aparecer no mapeamento e nas etapas ativas.',()=>{
   History.commit('Demanda restaurada',()=>{d.status=Classification.complete(d)?'Classificada':'Mapeada';},id);
-  Dialog.close();Render.header();Render.page();Feedback.toast('Demanda restaurada.',true);
+  Render.header();Render.page();Feedback.toast('Demanda restaurada.',true);
  },'Restaurar');
 }};
 const Navigation={go(step){TouchKeyboard.hide();if(Pointers.active.size||Gestures.pending.size)return Feedback.toast('Finalize os gestos antes de trocar de etapa.');if(step===5&&!State.reviewUnlocked)return Facilitator.gate();if(State.step===5)Facilitator.flush();State.step=step;Render.navigation();Render.page();$('#content').focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'})}};
